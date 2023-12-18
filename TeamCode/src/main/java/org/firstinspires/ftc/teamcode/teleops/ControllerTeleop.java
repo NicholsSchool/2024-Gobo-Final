@@ -54,6 +54,7 @@ public class ControllerTeleop extends OpMode {
 
         telemetry.addData("left trigger", driverController.leftTrigger);
         telemetry.addData("right stick y", driverController.rightStickY);
+        telemetry.update();
     }
 
     /**

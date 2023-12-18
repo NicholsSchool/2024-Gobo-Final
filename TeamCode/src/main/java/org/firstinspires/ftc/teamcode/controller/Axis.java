@@ -13,7 +13,7 @@ public class Axis {
     public static final double DEFAULT_DEADBAND = 0.005;
 
     /** The maximum value change per millisecond */
-    public static final double MAX_CHANGE_PER_MILLI = 0.001;
+    public static final double MAX_CHANGE_PER_MILLI = 0.005;
 
     private final ElapsedTime timer;
     private double value;
