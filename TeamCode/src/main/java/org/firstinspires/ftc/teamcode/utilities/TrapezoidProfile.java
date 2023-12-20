@@ -7,14 +7,15 @@ import com.qualcomm.robotcore.util.Range;
  * A trapezoid Profiler for smoothing changing values
  */
 public class TrapezoidProfile {
-    /** The default maximum value change per millisecond */
-    public static final double DEFAULT_MAX_CHANGE_PER_MILLI = 0.005;
-
+    /** The default initial value */
+    public static final double DEFAULT_INITIAL_VALUE = 0.0;
     /** The default minimum value */
     public static final double DEFAULT_MIN_VALUE = -1.0;
 
     /** The default maximum value */
     public static final double DEFAULT_MAX_VALUE = 1.0;
+    /** The default maximum value change per millisecond */
+    public static final double DEFAULT_MAX_CHANGE_PER_MILLI = 0.005;
 
     private final ElapsedTime timer;
     private final double minValue;
@@ -27,19 +28,20 @@ public class TrapezoidProfile {
      * Instantiates the Profile with the default values
      */
     public TrapezoidProfile() {
-        this(DEFAULT_MIN_VALUE, DEFAULT_MAX_VALUE, DEFAULT_MAX_CHANGE_PER_MILLI);
+        this(DEFAULT_INITIAL_VALUE, DEFAULT_MIN_VALUE, DEFAULT_MAX_VALUE, DEFAULT_MAX_CHANGE_PER_MILLI);
     }
 
     /**
      * Instantiates the Profile with the specified caps
      *
+     * @param initialValue the starting value
      * @param min the minimum value
      * @param max the maximum value
      * @param maxChange the maximum change
      */
-    public TrapezoidProfile(double min, double max, double maxChange) {
+    public TrapezoidProfile(double initialValue, double min, double max, double maxChange) {
         timer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
-        previousValue = 0.0;
+        previousValue = initialValue;
         minValue = min;
         maxValue = max;
         maxDelta = maxChange;
