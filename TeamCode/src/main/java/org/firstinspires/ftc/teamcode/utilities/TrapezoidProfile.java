@@ -61,11 +61,10 @@ public class TrapezoidProfile {
         else if(slope < -maxDelta)
             result = Range.clip(previousValue - maxDelta, minValue, maxValue);
         else
-            result = newValue;
+            result = Range.clip(newValue, minValue, maxValue);
 
-        timer.reset();
         previousValue = result;
-
+        timer.reset();
         return result;
     }
 }

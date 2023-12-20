@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.controller.Controller;
 
 /**
- * Teleop for testing Controller
+ * Teleop for testing Controller functionalities
  */
 @Config
 @TeleOp(name="Controller Testing")
@@ -54,6 +54,7 @@ public class ControllerTeleop extends OpMode {
 
         telemetry.addData("left trigger", driverController.leftTrigger);
         telemetry.addData("right stick y", driverController.rightStickY);
+        telemetry.addData("right stick x", driverController.rightStickX);
         telemetry.update();
     }
 

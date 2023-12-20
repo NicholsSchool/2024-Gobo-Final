@@ -2,16 +2,12 @@ package org.firstinspires.ftc.teamcode.controller;
 
 import androidx.annotation.NonNull;
 
-import org.firstinspires.ftc.teamcode.utilities.TrapezoidProfile;
-
 /**
  * An Axis on a Controller (triggers and joysticks)
  */
 public class Axis {
     /** The default Joystick deadband */
     public static final double DEFAULT_DEADBAND = 0.005;
-
-    private final TrapezoidProfile trapezoidProfile;
     private double value;
     private final double deadband;
 
@@ -26,7 +22,6 @@ public class Axis {
      * Instantiates an Axis with the specified deadband
      */
     public Axis(double desiredDeadband) {
-        trapezoidProfile = new TrapezoidProfile();
         value = 0.0;
         deadband = desiredDeadband;
     }
@@ -40,7 +35,7 @@ public class Axis {
      * Applies the deadband and Trapezoid Profile
      */
     public void update(double newValue) {
-        value = trapezoidProfile.update(applyDeadband(newValue));
+        value = applyDeadband(newValue);
     }
 
     /**
