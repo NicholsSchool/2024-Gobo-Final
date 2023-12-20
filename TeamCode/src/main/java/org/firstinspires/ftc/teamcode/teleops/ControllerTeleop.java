@@ -5,6 +5,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.controller.Controller;
 
@@ -15,6 +16,7 @@ import org.firstinspires.ftc.teamcode.controller.Controller;
 @TeleOp(name="Controller Testing")
 public class ControllerTeleop extends OpMode {
     Controller driverController;
+    ElapsedTime loopTimer;
 
     /**
      * Code to run ONCE when the driver hits INIT
@@ -22,6 +24,7 @@ public class ControllerTeleop extends OpMode {
     @Override
     public void init() {
         driverController = new Controller(gamepad1);
+        loopTimer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
     }
 
@@ -55,7 +58,13 @@ public class ControllerTeleop extends OpMode {
         telemetry.addData("left trigger", driverController.leftTrigger);
         telemetry.addData("right stick y", driverController.rightStickY);
         telemetry.addData("right stick x", driverController.rightStickX);
+        telemetry.addData("left stick radius", driverController.leftStickRadius());
+        telemetry.addData("left stick theta", driverController.leftStickTheta());
+
+        telemetry.addData("loop time millis", loopTimer.time());
         telemetry.update();
+
+        loopTimer.reset();
     }
 
     /**

@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
  */
 public class Controller {
     private final Gamepad gamepad;
-    
+
     public Button leftBumper;
     public Button rightBumper;
     public Button dpadUp;
@@ -86,5 +86,23 @@ public class Controller {
         leftStickY.update(-gamepad.left_stick_y);
         rightStickX.update(gamepad.right_stick_x);
         rightStickY.update(-gamepad.right_stick_y);
+    }
+
+    /**
+     * The Radius Value of the Left Joystick
+     *
+     * @return the hypotenuse length of x and y
+     */
+    public double leftStickRadius() {
+        return Math.hypot(leftStickX.getValue(), leftStickY.getValue());
+    }
+
+    /**
+     * The Theta Value of the Left Joystick
+     *
+     * @return the angle in degrees
+     */
+    public double leftStickTheta() {
+        return Math.toDegrees(Math.atan2(leftStickY.getValue(), leftStickX.getValue()));
     }
 }

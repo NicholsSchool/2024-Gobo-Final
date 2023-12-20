@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.teleops;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -7,8 +10,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 /**
  * A teleop to copy paste edit with
  */
-@TeleOp(name="CHANGE THIS NAME")
-public class SampleTeleop extends OpMode {
+@Config
+@TeleOp(name="[DASHBOARD] CHANGE THIS NAME")
+public class SampleDashboardTeleop extends OpMode {
     private ElapsedTime loopTimer;
 
     /**
@@ -17,6 +21,7 @@ public class SampleTeleop extends OpMode {
     @Override
     public void init() {
         loopTimer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
     }
 
     /**

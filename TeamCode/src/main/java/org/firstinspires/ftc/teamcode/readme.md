@@ -1,8 +1,8 @@
 TODOS...
 
-Experiment with Loop time, telemetry.update()
+Experiment with Loop time
 Fully test Controllers and Trapezoid Profile class
-Get IMU working - static electricity, expansion hub IMU, new Control Hub, navX
+Get IMU working, navX
 Tune camera exposure
 Odometry for Kiwi Drive
 Driving Code
