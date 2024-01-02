@@ -6,7 +6,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.controller.Controller;
 
 /**
- * Integrated Robot Subsystems
+ * Integrates Robot Subsystems and Controllers
  */
 public class Robot {
     private final Controller driverOI;
@@ -14,7 +14,7 @@ public class Robot {
     private final Telemetry telemetry;
 
     /**
-     * Instantiates the Robot. Call during Teleop init()
+     * Instantiates the Robot. Call during init()
      *
      * @param gamepad1  the driver gamepad
      * @param gamepad2  the operator gamepad
@@ -27,12 +27,20 @@ public class Robot {
     }
 
     /**
-     * Completes robot logic. Call during Teleop loop()
+     * Full Robot functionalities. Call in each loop()
      */
     public void update() {
+        updateInstances();
+
+        outputTelemetry();
+    }
+
+    private void updateInstances() {
         driverOI.update();
         operatorOI.update();
+    }
 
+    private void outputTelemetry() {
         telemetry.update();
     }
 }

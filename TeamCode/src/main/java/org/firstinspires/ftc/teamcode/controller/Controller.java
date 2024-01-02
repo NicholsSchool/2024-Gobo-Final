@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.controller;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 /**
- * The Controller containing Buttons and Axes
+ * The Controller containing Button and Axis objects
  */
 public class Controller {
     private final Gamepad gamepad;
@@ -62,7 +62,7 @@ public class Controller {
     }
 
     /**
-     * Updates all instances
+     * Updates all instances.
      */
     public void update() {
         leftBumper.update(gamepad.left_bumper);

@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 /**
- * A teleop to copy paste edit with
+ * A teleop for testing IMU
  */
 @Config
 @TeleOp(name="IMU Testing")

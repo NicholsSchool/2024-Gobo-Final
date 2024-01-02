@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 /**
  * A teleop to copy paste edit with
  */
-@TeleOp(name="CHANGE THIS NAME")
+@TeleOp(name="SAMPLE TELEOP")
 public class SampleTeleop extends OpMode {
     private ElapsedTime loopTimer;
 

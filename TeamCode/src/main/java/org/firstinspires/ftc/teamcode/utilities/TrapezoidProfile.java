@@ -9,11 +9,13 @@ import com.qualcomm.robotcore.util.Range;
 public class TrapezoidProfile {
     /** The default initial value */
     public static final double DEFAULT_INITIAL_VALUE = 0.0;
+
     /** The default minimum value */
     public static final double DEFAULT_MIN_VALUE = -1.0;
 
     /** The default maximum value */
     public static final double DEFAULT_MAX_VALUE = 1.0;
+
     /** The default maximum value change per millisecond */
     public static final double DEFAULT_MAX_CHANGE_PER_MILLI = 0.005;
 
@@ -48,7 +50,8 @@ public class TrapezoidProfile {
     }
 
     /**
-     * Updates the Profile and returns the next value
+     * Updates the Profile and returns the next value.
+     * Call in each loop()
      *
      * @param newValue the new value to smooth
      *

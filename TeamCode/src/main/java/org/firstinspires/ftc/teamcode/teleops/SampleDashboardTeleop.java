@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * A teleop to copy paste edit with
  */
 @Config
-@TeleOp(name="[DASHBOARD] CHANGE THIS NAME")
+@TeleOp(name="[DASHBOARD] SAMPLE TELEOP")
 public class SampleDashboardTeleop extends OpMode {
     private ElapsedTime loopTimer;
 

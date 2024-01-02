@@ -26,20 +26,15 @@ public class Axis {
         deadband = desiredDeadband;
     }
 
-    private double applyDeadband(double newValue) {
-        return Math.abs(newValue) >= deadband ? newValue : 0.0;
-    }
-
     /**
-     * Updates the Axis with the new state
-     * Applies the deadband and Trapezoid Profile
+     * Updates the Axis with the new state using the deadband
      */
     public void update(double newValue) {
-        value = applyDeadband(newValue);
+        value = Math.abs(newValue) >= deadband ? newValue : 0.0;
     }
 
     /**
-     * The Axis value
+     * The current Axis value
      *
      * @return the value
      */

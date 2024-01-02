@@ -53,7 +53,7 @@ public class Button {
      *
      * @return the toggle state
      */
-    public boolean getToggleState() {
+    public boolean toggleState() {
         return toggleState;
     }
 

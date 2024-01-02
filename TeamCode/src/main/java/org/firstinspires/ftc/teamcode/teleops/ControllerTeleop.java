@@ -52,7 +52,7 @@ public class ControllerTeleop extends OpMode {
         driverController.update();
 
         telemetry.addData("a is pressed", driverController.a);
-        telemetry.addData("b toggle", driverController.b.getToggleState());
+        telemetry.addData("b toggle", driverController.b.toggleState());
         telemetry.addData("x just pressed", driverController.x.wasJustPressed());
 
         telemetry.addData("left trigger", driverController.leftTrigger);
