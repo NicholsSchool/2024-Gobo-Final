@@ -9,6 +9,8 @@ Get IMU working, navX. Average both?????
 Tune camera exposure
 Odometry for Kiwi Drive
 Driving Code
+Lights functionalities
+tune all PID's
 
 ...
 
