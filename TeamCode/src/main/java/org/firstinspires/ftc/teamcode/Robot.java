@@ -5,6 +5,8 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.controller.Controller;
 
+//TODO: add subsystems and controls
+
 /**
  * Integrates Robot Subsystems and Controllers
  */
@@ -46,7 +48,7 @@ public class Robot {
     }
 
     private void updateAfter() {
-        //TODO: arm update here
+
     }
 
     private void outputTelemetry() {

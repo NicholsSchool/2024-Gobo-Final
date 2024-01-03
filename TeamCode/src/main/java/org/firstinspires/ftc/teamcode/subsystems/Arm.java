@@ -9,25 +9,22 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.teamcode.utilities.Constants;
 
 //TODO: sync right shoulder direction with dead wheel
-//TODO: fix and tune arm go to position
-//TODO: tune wrist go to position, try using RUN_TO_POSITION run-mode or dampening
+//TODO: fix and tune arm go to position and governor
+//TODO: consider using arm angle conversion
+//TODO: tune wrist go to position and governor, try using RUN_TO_POSITION run-mode or dampening
 //TODO: tune fourbar switching angle
-//TODO: full check of all functionalities
 
 /**
  * Robot Arm Subsystem
  */
 public class Arm {
-    /** Wrist Encoder ticks per full revolution */
-    public static final int CORE_HEX_TICKS_PER_REV = 288;
-
     private final DcMotorEx leftShoulder;
     private final DcMotorEx rightShoulder;
     private final DcMotorEx wrist;
     private final Servo planeLauncher;
     private final ElapsedTime timer;
+    private double previousArmPosition;
 
-    private double previousPosition;
     /**
      * Initializes the Arm
      */
@@ -61,7 +58,7 @@ public class Arm {
      * Updates data for arm go to position control
      */
     public void update() {
-        previousPosition = getArmPosition();
+        previousArmPosition = getArmPosition();
         timer.reset();
     }
 
@@ -77,7 +74,7 @@ public class Arm {
     /**
      * Moves both shoulder motors together manually
      *
-     * @param power the input motor power [-1, 1]
+     * @param power the input motor power
      */
     public void shoulderManual(double power) {
         power = Range.clip(power, -0.5, 0.5);
@@ -104,7 +101,7 @@ public class Arm {
 
         double power = 0.0005 * (desiredPosition - position);
         double scalingFactor = 0.000022 * (2850 - position);
-        double dampening = 0.0000044 * (position - previousPosition) / timer.time();
+        double dampening = 0.0000044 * (position - previousArmPosition) / timer.time();
 
         shoulderManual(power + scalingFactor - dampening);
     }
@@ -124,6 +121,7 @@ public class Arm {
      * @return the angle
      */
     public double getWristAngle() {
+        int CORE_HEX_TICKS_PER_REV = 288;
         return wrist.getCurrentPosition() * 360.0 / CORE_HEX_TICKS_PER_REV + 90.0;
     }
 

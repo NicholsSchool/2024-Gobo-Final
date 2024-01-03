@@ -9,6 +9,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.controller.Controller;
 
+//TODO: full check of all controller functionalities
+
 /**
  * Teleop for testing Controller functionalities
  */
@@ -26,22 +28,6 @@ public class ControllerTeleop extends OpMode {
         driverController = new Controller(gamepad1);
         loopTimer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-    }
-
-    /**
-     * Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
-     */
-    @Override
-    public void init_loop() {
-
-    }
-
-    /**
-     * Code to run ONCE when the driver hits PLAY
-     */
-    @Override
-    public void start() {
-
     }
 
     /**
@@ -65,13 +51,5 @@ public class ControllerTeleop extends OpMode {
         telemetry.update();
 
         loopTimer.reset();
-    }
-
-    /**
-     * Code to run ONCE after the driver hits STOP
-     */
-    @Override
-    public void stop() {
-
     }
 }

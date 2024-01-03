@@ -11,6 +11,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
+//TODO: Fully Test IMU
+
+//TODO: Test out the NavX
+
 /**
  * A teleop for testing the internal BHI260IMU
  */
