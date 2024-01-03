@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.utilities;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+//TODO: modify if needed for smoothing turning input
+
 /**
  * A trapezoid Profiler for smoothing changing values
  */
@@ -58,13 +60,14 @@ public class TrapezoidProfile {
      * @return the smoothed new value
      */
     public double update(double newValue) {
-        double slope = (newValue - previousValue) / timer.time();
+        double time = timer.time();
+        double slope = (newValue - previousValue) / time;
 
         double result;
         if(slope > maxDelta)
-             result = Range.clip(previousValue + maxDelta, minValue, maxValue);
+             result = Range.clip(previousValue + maxDelta * time, minValue, maxValue);
         else if(slope < -maxDelta)
-            result = Range.clip(previousValue - maxDelta, minValue, maxValue);
+            result = Range.clip(previousValue - maxDelta * time, minValue, maxValue);
         else
             result = Range.clip(newValue, minValue, maxValue);
 

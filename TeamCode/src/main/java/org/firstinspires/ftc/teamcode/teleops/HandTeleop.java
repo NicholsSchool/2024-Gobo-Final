@@ -29,7 +29,6 @@ public class HandTeleop extends OpMode {
         hand = new Hand(hardwareMap);
         loopTimer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-
     }
 
     /**

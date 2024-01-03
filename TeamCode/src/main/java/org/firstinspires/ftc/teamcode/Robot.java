@@ -30,14 +30,23 @@ public class Robot {
      * Full Robot functionalities. Call in each loop()
      */
     public void update() {
-        updateInstances();
-
+        updatePrior();
+        teleopLogic();
+        updateAfter();
         outputTelemetry();
     }
 
-    private void updateInstances() {
+    private void updatePrior() {
         driverOI.update();
         operatorOI.update();
+    }
+
+    private void teleopLogic() {
+
+    }
+
+    private void updateAfter() {
+        //TODO: arm update here
     }
 
     private void outputTelemetry() {
