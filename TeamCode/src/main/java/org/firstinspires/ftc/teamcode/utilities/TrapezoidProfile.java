@@ -3,28 +3,16 @@ package org.firstinspires.ftc.teamcode.utilities;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-//TODO: modify if needed for smoothing turning input
+//TODO: check for bugs
 
 /**
  * A trapezoid Profiler for smoothing changing values
  */
 public class TrapezoidProfile {
-    /** The default initial value */
-    public static final double DEFAULT_INITIAL_VALUE = 0.0;
-
-    /** The default minimum value */
-    public static final double DEFAULT_MIN_VALUE = -1.0;
-
-    /** The default maximum value */
-    public static final double DEFAULT_MAX_VALUE = 1.0;
-
-    /** The default maximum value change per millisecond */
-    public static final double DEFAULT_MAX_CHANGE_PER_MILLI = 0.005;
-
     private final ElapsedTime timer;
     private final double minValue;
     private final double maxValue;
-    private final double maxDelta;
+    private final double maxDeltaPerSecond;
     private double previousValue;
 
 
@@ -32,7 +20,7 @@ public class TrapezoidProfile {
      * Instantiates the Profile with the default values
      */
     public TrapezoidProfile() {
-        this(DEFAULT_INITIAL_VALUE, DEFAULT_MIN_VALUE, DEFAULT_MAX_VALUE, DEFAULT_MAX_CHANGE_PER_MILLI);
+        this(0.0, -1.0, 1.0, 2.0);
     }
 
     /**
@@ -41,14 +29,14 @@ public class TrapezoidProfile {
      * @param initialValue the starting value
      * @param min the minimum value
      * @param max the maximum value
-     * @param maxChange the maximum change
+     * @param maxChange the maximum change per second
      */
     public TrapezoidProfile(double initialValue, double min, double max, double maxChange) {
-        timer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+        timer = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
         previousValue = initialValue;
         minValue = min;
         maxValue = max;
-        maxDelta = maxChange;
+        maxDeltaPerSecond = maxChange;
     }
 
     /**
@@ -63,15 +51,17 @@ public class TrapezoidProfile {
         double time = timer.time();
         double slope = (newValue - previousValue) / time;
 
+        double maxDelta = maxDeltaPerSecond * time;
         double result;
         if(slope > maxDelta)
-             result = Range.clip(previousValue + maxDelta * time, minValue, maxValue);
+             result = Range.clip(previousValue + maxDelta, minValue, maxValue);
         else if(slope < -maxDelta)
-            result = Range.clip(previousValue - maxDelta * time, minValue, maxValue);
+            result = Range.clip(previousValue - maxDelta, minValue, maxValue);
         else
             result = Range.clip(newValue, minValue, maxValue);
 
         previousValue = result;
+
         timer.reset();
         return result;
     }
