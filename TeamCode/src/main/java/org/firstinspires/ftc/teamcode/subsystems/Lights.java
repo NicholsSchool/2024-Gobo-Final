@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver.BlinkinPattern;
 
-//TODO: store used patterns as constants so you don't need to put them as parameters, make several methods
+//TODO: store useful patterns as constants, make methods w/o params. Use for displaying on major actions
 
 /**
  * Robot Indicator Lights Subsystem

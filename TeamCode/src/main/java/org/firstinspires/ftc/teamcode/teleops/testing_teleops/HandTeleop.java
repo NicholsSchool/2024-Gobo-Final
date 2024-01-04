@@ -9,8 +9,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.subsystems.Hand;
 
-//TODO: test Hand functionalities
-
 /**
  * Hand Testing
  */

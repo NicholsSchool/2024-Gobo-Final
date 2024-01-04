@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.other;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -7,8 +7,6 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.controller.Controller;
 
 //TODO: add subsystems and controls
-//TODO: Use the lights to communicate major things instead of telemetry
-
 
 /**
  * Integrates Robot Subsystems and Controllers

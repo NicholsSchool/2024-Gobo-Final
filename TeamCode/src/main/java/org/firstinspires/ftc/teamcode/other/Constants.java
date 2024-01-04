@@ -1,9 +1,9 @@
-package org.firstinspires.ftc.teamcode.utilities;
+package org.firstinspires.ftc.teamcode.other;
 
 /**
  * Robot Constants used in multiple Classes
  */
-public class Constants {
+public final class Constants {
     /** Denotes Red Alliance in Subsystem Constructors */
     public static final boolean IS_RED_ALLIANCE = false;
 

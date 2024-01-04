@@ -1,11 +1,11 @@
-package org.firstinspires.ftc.teamcode.utilities;
+package org.firstinspires.ftc.teamcode.other;
+
+//TODO: include localization math and weighted averaging or elements of it
 
 /**
  * Methods for doing math with Angles
  */
 public class AngleMath {
-    //TODO: april tag localization math can go here, including weighted averaging based on distance
-
     /**
      * Adds angles and keeps the sum in the range [-180, 180)
      *

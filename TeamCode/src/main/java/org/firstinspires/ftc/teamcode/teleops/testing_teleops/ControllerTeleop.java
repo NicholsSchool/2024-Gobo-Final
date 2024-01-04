@@ -9,8 +9,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.controller.Controller;
-import org.firstinspires.ftc.teamcode.utilities.CoordinateTrapezoidProfile;
-import org.firstinspires.ftc.teamcode.utilities.TrapezoidProfile;
+import org.firstinspires.ftc.teamcode.other.CoordinateTrapezoidProfile;
+import org.firstinspires.ftc.teamcode.other.TrapezoidProfile;
 
 //TODO: make the field image better, do rotation, image, correct scaling, centered square, etc
 

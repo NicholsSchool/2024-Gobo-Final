@@ -1,5 +1,7 @@
 GOALS/TODOS/NOTES ...
 
+We REALLY need a new wrist motor and hand, they SUCK
+
 Will assuming the wrist offset at the start of teleop cause problems?
 
 Be mindful with loop times with each new functionality (especially IMU and Vision)
@@ -12,10 +14,11 @@ Consider re-drilling odometry (and/or tightening front one) if it shows to be a 
 Verified:
 Both profiles work as intended (both need tuning for all cases)
 Controller works as intended
-IMU works as intended with negligible loop delay
+IMU works as intended
 Hand works as intended
+Lights work as intended (need to switch out right side)
 
 Testing Order:
-Lights (isn't working at all)
 Arm
 Drivetrain
+Vision

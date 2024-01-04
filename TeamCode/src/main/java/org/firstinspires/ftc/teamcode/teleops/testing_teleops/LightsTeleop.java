@@ -10,8 +10,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.subsystems.Lights;
 
-//TODO: test lights functionalities
-
 /**
  * Teleop for testing Lights functionalities
  */

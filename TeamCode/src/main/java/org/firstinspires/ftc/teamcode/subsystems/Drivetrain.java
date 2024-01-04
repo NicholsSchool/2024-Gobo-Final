@@ -3,14 +3,14 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.qualcomm.hardware.bosch.BHI260IMU;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.utilities.AngleMath;
+import org.firstinspires.ftc.teamcode.other.AngleMath;
 
 //TODO: verify all motor directions
-//TODO: sync front odometry direction with shoulder
 //TODO: add in coordinate profiling
 //TODO: drive motor tuning teleop
 //TODO: odometry tuning
@@ -75,7 +75,7 @@ public class Drivetrain {
         backDrive.setDirection(DcMotorEx.Direction.FORWARD);
         leftOdometry.setDirection(DcMotorEx.Direction.FORWARD);
         rightOdometry.setDirection(DcMotorEx.Direction.FORWARD);
-        frontOdometry.setDirection(DcMotorEx.Direction.FORWARD);
+        frontOdometry.setDirection(DcMotorEx.Direction.REVERSE);
 
 //        leftDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 //        rightDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
