@@ -10,7 +10,6 @@ import org.firstinspires.ftc.teamcode.utilities.Constants;
 
 //TODO: sync right shoulder direction with dead wheel
 //TODO: fix and tune arm go to position and governor
-//TODO: consider using arm angle conversion
 //TODO: tune wrist go to position and governor, try using RUN_TO_POSITION run-mode or dampening
 //TODO: tune fourbar switching angle
 
@@ -18,6 +17,8 @@ import org.firstinspires.ftc.teamcode.utilities.Constants;
  * Robot Arm Subsystem
  */
 public class Arm {
+    private final int CORE_HEX_TICKS_PER_REV = 288;
+
     private final DcMotorEx leftShoulder;
     private final DcMotorEx rightShoulder;
     private final DcMotorEx wrist;
@@ -43,7 +44,9 @@ public class Arm {
 
         wrist = hardwareMap.get(DcMotorEx.class, "wrist");
         wrist.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        wrist.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        wrist.setTargetPosition(0);
+        wrist.setTargetPositionTolerance(0);
+        wrist.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
         wrist.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         wrist.setDirection(DcMotorEx.Direction.REVERSE);
 
@@ -92,7 +95,7 @@ public class Arm {
     }
 
     /**
-     * Moves the arm to position
+     * Moves the arm to position using an external feedback loop
      *
      * @param desiredPosition the encoder position to go to
      */
@@ -121,26 +124,25 @@ public class Arm {
      * @return the angle
      */
     public double getWristAngle() {
-        int CORE_HEX_TICKS_PER_REV = 288;
-        return wrist.getCurrentPosition() * 360.0 / CORE_HEX_TICKS_PER_REV + 90.0;
+        return wrist.getCurrentPosition() * 360.0 / CORE_HEX_TICKS_PER_REV;
     }
 
     /**
-     * Moves the wrist to the given angle
+     * Moves the wrist to the given position
      *
-     * @param angle the desired angle
+     * @param position the target encoder position
      */
-    public void wristGoToAngle(double angle) {
-        wristManual(0.01 * (angle - getWristAngle()));
+    public void wristGoToPosition(int position) {
+        wrist.setTargetPosition(position);
     }
 
     /**
-     * Moves the wrist to in-taking or scoring angle automatically
+     * Moves the wrist to the intaking or scoring angle automatically
      */
     public void wristFourbar() {
         if(getArmPosition() <= 300)
-            wristGoToAngle(-getArmPosition() * 360.0 / Constants.THRU_BORE_TICKS_PER_REV);
+            wristGoToPosition((int)(-getArmPosition() * CORE_HEX_TICKS_PER_REV * 1.0 / Constants.THRU_BORE_TICKS_PER_REV));
         else
-            wristGoToAngle(60.0 - getArmPosition() * 360.0 / Constants.THRU_BORE_TICKS_PER_REV);
+            wristGoToPosition((int)(48 - getArmPosition() * CORE_HEX_TICKS_PER_REV * 1.0 / Constants.THRU_BORE_TICKS_PER_REV));
     }
 }

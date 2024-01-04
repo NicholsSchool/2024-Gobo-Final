@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.utilities;
 
-//TODO: check for bugs
+//TODO: tune max speeds for driving and localization
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -12,7 +12,7 @@ public class CoordinateTrapezoidProfile {
     private final ElapsedTime timer;
     private final double minValue;
     private final double maxValue;
-    private final double maxDeltaPerSecond;
+    private final double maxSpeed;
     private double previousX;
     private double previousY;
 
@@ -21,7 +21,7 @@ public class CoordinateTrapezoidProfile {
      * Instantiates the Profile with the default values
      */
     public CoordinateTrapezoidProfile() {
-        this(0.0, 0.0, -1.0, 1.0, 1.0);
+        this(0.0, 0.0, -1.0, 1.0, 2.0);
     }
 
     /**
@@ -31,15 +31,15 @@ public class CoordinateTrapezoidProfile {
      * @param initialY the starting Y value
      * @param min the minimum value
      * @param max the maximum value
-     * @param maxChange the maximum change
+     * @param maxSpeed the maximum change per second
      */
-    public CoordinateTrapezoidProfile(double initialX, double initialY, double min, double max, double maxChange) {
+    public CoordinateTrapezoidProfile(double initialX, double initialY, double min, double max, double maxSpeed) {
         timer = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
         previousX = initialX;
         previousY = initialY;
         minValue = min;
         maxValue = max;
-        maxDeltaPerSecond = maxChange;
+        this.maxSpeed = maxSpeed;
     }
 
     /**
@@ -53,18 +53,18 @@ public class CoordinateTrapezoidProfile {
      */
     public double[] update(double newX, double newY) {
         double time = timer.time();
-        double delta = Math.hypot(newX - previousX, newY - previousY);
+        double change = Math.hypot(newX - previousX, newY - previousY);
 
         double[] result;
-        if(delta <= maxDeltaPerSecond * time)
+        if(change <= maxSpeed * time)
             result = new double[]{
                     Range.clip(newX, minValue, maxValue),
                     Range.clip(newY, minValue, maxValue)};
         else
             result = new double[]{
-                    Range.clip(previousX + maxDeltaPerSecond * time * (newX - previousX) / delta,
+                    Range.clip(previousX + maxSpeed * time * (newX - previousX) / change,
                             minValue, maxValue),
-                    Range.clip(previousY + maxDeltaPerSecond * time * (newY - previousY) / delta,
+                    Range.clip(previousY + maxSpeed * time * (newY - previousY) / change,
                             minValue, maxValue)};
 
         previousX = result[0];

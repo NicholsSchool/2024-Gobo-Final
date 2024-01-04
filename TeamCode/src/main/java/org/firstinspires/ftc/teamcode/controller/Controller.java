@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.controller;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.util.Range;
 
 /**
  * The Controller containing Button and Axis objects
@@ -94,7 +95,7 @@ public class Controller {
      * @return the hypotenuse length of x and y
      */
     public double leftStickRadius() {
-        return Math.hypot(leftStickX.getValue(), leftStickY.getValue());
+        return Range.clip(Math.hypot(leftStickX.getValue(), leftStickY.getValue()), 0.0, 1.0);
     }
 
     /**

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.teleops;
+package org.firstinspires.ftc.teamcode.teleops.testing_teleops;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -25,7 +25,7 @@ public class ArmTeleop extends OpMode {
     public static double wristPower;
     public static boolean wristGoToPos;
     public static boolean isFourbar;
-    public static double wristDesiredAngle;
+    public static int wristDesiredPosition;
     public static boolean launchPlane;
 
     /**
@@ -52,7 +52,7 @@ public class ArmTeleop extends OpMode {
         if(isFourbar)
             arm.wristFourbar();
         else if(wristGoToPos)
-            arm.wristGoToAngle(wristDesiredAngle);
+            arm.wristGoToPosition(wristDesiredPosition);
         else
             arm.wristManual(wristPower);
 

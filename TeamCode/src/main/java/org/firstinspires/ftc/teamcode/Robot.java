@@ -1,11 +1,14 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.controller.Controller;
 
 //TODO: add subsystems and controls
+//TODO: Use the lights to communicate major things instead of telemetry
+
 
 /**
  * Integrates Robot Subsystems and Controllers
@@ -14,6 +17,7 @@ public class Robot {
     private final Controller driverOI;
     private final Controller operatorOI;
     private final Telemetry telemetry;
+    private final ElapsedTime loopTimer;
 
     /**
      * Instantiates the Robot. Call during init()
@@ -26,6 +30,7 @@ public class Robot {
         driverOI = new Controller(gamepad1);
         operatorOI = new Controller(gamepad2);
         this.telemetry = telemetry;
+        loopTimer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     }
 
     /**
@@ -33,9 +38,12 @@ public class Robot {
      */
     public void update() {
         updatePrior();
+
         teleopLogic();
-        updateAfter();
+
         outputTelemetry();
+
+        updateAfter();
     }
 
     private void updatePrior() {
@@ -47,11 +55,12 @@ public class Robot {
 
     }
 
-    private void updateAfter() {
-
+    private void outputTelemetry() {
+        telemetry.addData("loop time", loopTimer.time());
+        telemetry.update();
     }
 
-    private void outputTelemetry() {
-        telemetry.update();
+    private void updateAfter() {
+        loopTimer.reset();
     }
 }

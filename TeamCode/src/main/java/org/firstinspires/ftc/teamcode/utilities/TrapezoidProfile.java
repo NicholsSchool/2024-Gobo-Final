@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.utilities;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-//TODO: check for bugs
+//TODO: tune max speed for turning
 
 /**
  * A trapezoid Profiler for smoothing changing values
@@ -12,7 +12,7 @@ public class TrapezoidProfile {
     private final ElapsedTime timer;
     private final double minValue;
     private final double maxValue;
-    private final double maxDeltaPerSecond;
+    private final double maxSpeed;
     private double previousValue;
 
 
@@ -20,23 +20,23 @@ public class TrapezoidProfile {
      * Instantiates the Profile with the default values
      */
     public TrapezoidProfile() {
-        this(0.0, -1.0, 1.0, 2.0);
+        this(0.0, -1.0, 1.0, 1.0);
     }
 
     /**
-     * Instantiates the Profile with the specified caps
+     * Instantiates the Profile with the specified values
      *
      * @param initialValue the starting value
      * @param min the minimum value
      * @param max the maximum value
-     * @param maxChange the maximum change per second
+     * @param maxSpeed the maximum change per second
      */
-    public TrapezoidProfile(double initialValue, double min, double max, double maxChange) {
+    public TrapezoidProfile(double initialValue, double min, double max, double maxSpeed) {
         timer = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
         previousValue = initialValue;
         minValue = min;
         maxValue = max;
-        maxDeltaPerSecond = maxChange;
+        this.maxSpeed = maxSpeed;
     }
 
     /**
@@ -49,14 +49,14 @@ public class TrapezoidProfile {
      */
     public double update(double newValue) {
         double time = timer.time();
-        double slope = (newValue - previousValue) / time;
+        double change = newValue - previousValue;
 
-        double maxDelta = maxDeltaPerSecond * time;
+        double maxChange = maxSpeed * time;
         double result;
-        if(slope > maxDelta)
-             result = Range.clip(previousValue + maxDelta, minValue, maxValue);
-        else if(slope < -maxDelta)
-            result = Range.clip(previousValue - maxDelta, minValue, maxValue);
+        if(change > maxChange)
+             result = Range.clip(previousValue + maxChange, minValue, maxValue);
+        else if(change < -maxChange)
+            result = Range.clip(previousValue - maxChange, minValue, maxValue);
         else
             result = Range.clip(newValue, minValue, maxValue);
 

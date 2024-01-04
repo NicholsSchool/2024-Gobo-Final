@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.teleops;
+package org.firstinspires.ftc.teamcode.teleops.testing_teleops;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -11,15 +11,13 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
-//TODO: Fully Test IMU
-
-//TODO: Test out the NavX
+//TODO: Test out the NavX if ever necessary
 
 /**
  * A teleop for testing the internal BHI260IMU
  */
 @Config
-@TeleOp(name="Internal IMU Testing")
+@TeleOp(name="[DASHBOARD] Internal IMU Testing")
 public class ImuTeleop extends OpMode {
     private ElapsedTime loopTimer;
     private BHI260IMU imu;
@@ -33,8 +31,8 @@ public class ImuTeleop extends OpMode {
 
         imu = hardwareMap.get(BHI260IMU.class, "imu");
         imu.initialize(new BHI260IMU.Parameters(new RevHubOrientationOnRobot(
-                        RevHubOrientationOnRobot.LogoFacingDirection.UP,
-                        RevHubOrientationOnRobot.UsbFacingDirection.FORWARD)));
+                        RevHubOrientationOnRobot.LogoFacingDirection.DOWN,
+                        RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD)));
         imu.resetYaw();
 
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
