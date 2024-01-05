@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.other;
 
-//TODO: include localization math and weighted averaging or elements of it
-
 /**
  * Methods for doing math with Angles
  */

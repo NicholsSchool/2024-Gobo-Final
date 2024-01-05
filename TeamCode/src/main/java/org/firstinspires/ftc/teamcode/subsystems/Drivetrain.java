@@ -3,38 +3,34 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.qualcomm.hardware.bosch.BHI260IMU;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.other.AngleMath;
 
-//TODO: verify all motor directions
-//TODO: add in coordinate profiling
-//TODO: drive motor tuning teleop
-//TODO: odometry tuning
-//TODO: tune all other values
-//TODO: get navx working, then see which IMU is faster
-//TODO: edit spline waypoints for the new bot
-//TODO: reset IMU for teleops in real matches
 //TODO: add april tags pose updating, figure out how to make heading offset work
 
+//TODO: drive motor tuning teleop
+//TODO: odometry tuning
+//TODO: tune both profiles
+//TODO: edit spline waypoints for the new bot
 
 /**
  * Robot Drivetrain Subsystem
  */
 public class Drivetrain {
-    private final int MAX_MOTOR_VEL = 2800;
-    private final double SPLINE_P = 0.05;
-    private final double SPLINE_ERROR = 2.0;
-    private final double SPLINE_GOVERNOR = 1.0;
     public final double BLUE_SCORING_Y_CLOSE = -42.0;
     public final double BLUE_SCORING_Y_MED = -36.0;
     public final double BLUE_SCORING_Y_FAR = -30.0;
     public final double RED_SCORING_Y_CLOSE = 42.0;
     public final double RED_SCORING_Y_MED = 36.0;
     public final double RED_SCORING_Y_FAR = 30.0;
+
+    private final int MAX_MOTOR_VEL = 2800;
+    private final double SPLINE_P = 0.05;
+    private final double SPLINE_ERROR = 2.0;
+    private final double SPLINE_GOVERNOR = 1.0;
     private final double LEFT_WAYPOINT_X = -16.0;
     private final double RIGHT_WAYPOINT_X = 40.0;
     private final double BLUE_WAYPOINT_Y = 36.0;
@@ -70,19 +66,19 @@ public class Drivetrain {
         rightOdometry = hwMap.get(DcMotorEx.class, "rightOdometry");
         frontOdometry = hwMap.get(DcMotorEx.class, "rightShoulder");
 
-        leftDrive.setDirection(DcMotorEx.Direction.FORWARD);
-        rightDrive.setDirection(DcMotorEx.Direction.FORWARD);
-        backDrive.setDirection(DcMotorEx.Direction.FORWARD);
+        leftDrive.setDirection(DcMotorEx.Direction.REVERSE);
+        rightDrive.setDirection(DcMotorEx.Direction.REVERSE);
+        backDrive.setDirection(DcMotorEx.Direction.REVERSE);
         leftOdometry.setDirection(DcMotorEx.Direction.FORWARD);
-        rightOdometry.setDirection(DcMotorEx.Direction.FORWARD);
+        rightOdometry.setDirection(DcMotorEx.Direction.REVERSE);
         frontOdometry.setDirection(DcMotorEx.Direction.REVERSE);
 
-//        leftDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-//        rightDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-//        backDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        leftDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-        rightDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-        backDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+        leftDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        rightDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        backDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+//        leftDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+//        rightDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+//        backDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
 
         leftDrive.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         rightDrive.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);

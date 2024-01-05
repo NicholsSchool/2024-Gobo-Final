@@ -3,11 +3,17 @@ package org.firstinspires.ftc.teamcode.controller;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.teamcode.other.CoordinateTrapezoidProfile;
+import org.firstinspires.ftc.teamcode.other.TrapezoidProfile;
+
 /**
  * The Controller containing Button and Axis objects
  */
 public class Controller {
     private final Gamepad gamepad;
+
+    private final CoordinateTrapezoidProfile leftJoystickProfile;
+    private final TrapezoidProfile rightXProfile;
 
     public Button leftBumper;
     public Button rightBumper;
@@ -38,6 +44,9 @@ public class Controller {
      */
     public Controller(Gamepad gamepad) {
         this.gamepad = gamepad;
+
+        leftJoystickProfile = new CoordinateTrapezoidProfile();
+        rightXProfile =  new TrapezoidProfile();
         
         leftBumper = new Button();
         rightBumper = new Button();
@@ -81,12 +90,13 @@ public class Controller {
         leftStick.update(gamepad.left_stick_button);
         rightStick.update(gamepad.right_stick_button);
 
+        double[] leftStick = leftJoystickProfile.update(gamepad.left_stick_x, -gamepad.left_stick_y);
+        leftStickX.update(leftStick[0]);
+        leftStickY.update(leftStick[1]);
+        rightStickX.update(rightXProfile.update(gamepad.right_stick_x));
+        rightStickY.update(-gamepad.right_stick_y);
         leftTrigger.update(gamepad.left_trigger);
         rightTrigger.update(gamepad.right_trigger);
-        leftStickX.update(gamepad.left_stick_x);
-        leftStickY.update(-gamepad.left_stick_y);
-        rightStickX.update(gamepad.right_stick_x);
-        rightStickY.update(-gamepad.right_stick_y);
     }
 
     /**

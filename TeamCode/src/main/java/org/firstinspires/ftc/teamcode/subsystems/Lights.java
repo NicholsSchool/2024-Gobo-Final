@@ -4,8 +4,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver.BlinkinPattern;
 
-//TODO: store useful patterns as constants, make methods w/o params. Use for displaying on major actions
-
 /**
  * Robot Indicator Lights Subsystem
  * A full list of REV blink codes can be found

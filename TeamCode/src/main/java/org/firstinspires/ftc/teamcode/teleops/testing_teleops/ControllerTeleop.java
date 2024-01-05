@@ -9,21 +9,17 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.controller.Controller;
-import org.firstinspires.ftc.teamcode.other.CoordinateTrapezoidProfile;
-import org.firstinspires.ftc.teamcode.other.TrapezoidProfile;
 
-//TODO: make the field image better, do rotation, image, correct scaling, centered square, etc
+//TODO: put color over the grid, do the correct rotation and scaling, and center the square
 
 /**
- * Teleop for testing Controller functionalities
+ * Teleop for testing Controller and Profiling functionalities
  */
 @Config
 @TeleOp(name="Controller Testing")
 public class ControllerTeleop extends OpMode {
     private Controller driverController;
     private ElapsedTime loopTimer;
-    private TrapezoidProfile triggerProfile;
-    private CoordinateTrapezoidProfile joystickProfile;
     private final FtcDashboard dashboard = FtcDashboard.getInstance();
 
     /**
@@ -34,9 +30,6 @@ public class ControllerTeleop extends OpMode {
         driverController = new Controller(gamepad1);
         loopTimer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
-
-        triggerProfile = new TrapezoidProfile();
-        joystickProfile = new CoordinateTrapezoidProfile();
     }
 
     /**
@@ -46,31 +39,23 @@ public class ControllerTeleop extends OpMode {
     public void loop() {
         driverController.update();
 
-        telemetry.addData("a is pressed", driverController.a);
-        telemetry.addData("b toggle", driverController.b.toggleState());
-        telemetry.addData("x just pressed", driverController.x.wasJustPressed());
+        double leftX = driverController.leftStickX.getValue();
+        double leftY = driverController.leftStickY.getValue();
+        telemetry.addData("left stick x", leftX);
+        telemetry.addData("left stick y", leftY);
 
-        double[] leftJoystick = joystickProfile.update(driverController.rightStickX.getValue(), driverController.rightStickY.getValue());
-        telemetry.addData("right stick x", leftJoystick[0]);
-        telemetry.addData("right stick y", leftJoystick[1]);
-        telemetry.addData("left stick radius", driverController.leftStickRadius());
-        telemetry.addData("left stick theta", driverController.leftStickTheta());
-
-        telemetry.addData("left trigger", driverController.leftTrigger);
-        telemetry.addData("right trigger", triggerProfile.update(driverController.rightTrigger.getValue()));
+        telemetry.addData("right stick x", driverController.rightStickX);
 
         telemetry.addData("loop time millis", loopTimer.time());
 
         TelemetryPacket packet = new TelemetryPacket(false);
         packet.fieldOverlay()
                 .drawGrid(0.0, 0.0, 144.0, 144.0, 21, 21)
-                .setFill("blue")
-                .fillRect(leftJoystick[1] * 72, -leftJoystick[0] * 72, 7.2, 7.2);
-
+                .setFill("red")
+                .fillRect(leftY * 72, -leftX * 72, 7.2, 7.2);
         dashboard.sendTelemetryPacket(packet);
 
         telemetry.update();
-
         loopTimer.reset();
     }
 }

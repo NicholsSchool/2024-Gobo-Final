@@ -3,8 +3,6 @@ package org.firstinspires.ftc.teamcode.other;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-//TODO: tune max speed for turning
-
 /**
  * A trapezoid Profiler for smoothing changing values
  */
@@ -20,7 +18,7 @@ public class TrapezoidProfile {
      * Instantiates the Profile with the default values
      */
     public TrapezoidProfile() {
-        this(0.0, -1.0, 1.0, 1.0);
+        this(0.0, -1.0, 1.0, 0.5);
     }
 
     /**

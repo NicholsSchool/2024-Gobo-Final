@@ -1,5 +1,8 @@
 GOALS/TODOS/NOTES ...
 
+
+DO NOT RESET IMU AT THE START OF TELEOP FOR COMPETITION MATCHES, REMOVE LINE FROM DRIVETRAIN
+
 We REALLY need a new wrist motor and hand, they SUCK
 
 Will assuming the wrist offset at the start of teleop cause problems?
@@ -9,16 +12,17 @@ Current Estimate: empty = 1-2 millis, no vision/imu 10-30 millis
 
 Have James put TF file on the robot
 
-Consider re-drilling odometry (and/or tightening front one) if it shows to be a problem
+Consider tighten front odometry, loosen all wheels. Consider re-drilling if problems occur
+
+If ever necessary, use the NavX over the internal IMU
+
 
 Verified:
-Both profiles work as intended (both need tuning for all cases)
-Controller works as intended
-IMU works as intended
-Hand works as intended
-Lights work as intended (need to switch out right side)
+Controller and Profile Classes  (tuning needed)
+Hand
+Lights                          (need to switch out right side)
+Arm                             (tuning needed)
 
-Testing Order:
-Arm
+Unfinished/Untested:
 Drivetrain
 Vision

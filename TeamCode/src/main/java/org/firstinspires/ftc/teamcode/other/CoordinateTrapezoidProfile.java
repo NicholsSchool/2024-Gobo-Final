@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.other;
 
-//TODO: tune max speeds for driving and localization
-
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -21,7 +19,7 @@ public class CoordinateTrapezoidProfile {
      * Instantiates the Profile with the default values
      */
     public CoordinateTrapezoidProfile() {
-        this(0.0, 0.0, -1.0, 1.0, 2.0);
+        this(0.0, 0.0, -1.0, 1.0, 4.0);
     }
 
     /**

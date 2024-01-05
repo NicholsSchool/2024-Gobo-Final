@@ -27,7 +27,6 @@ public class ArmTeleop extends OpMode {
     public static double wristPower;
     public static int wristDesiredPosition;
     public static boolean launchPlane;
-    public static double p;
 
     /**
      * Code to run ONCE when the driver hits INIT
@@ -51,9 +50,9 @@ public class ArmTeleop extends OpMode {
             arm.shoulderManual(shoulderPower);
 
         if(isFourbar)
-            arm.getWristPosition(); //TODO: put fourbar back
+            arm.wristFourbar();
         else if(wristGoToPos)
-            arm.wristGoToPosition(wristDesiredPosition, p);
+            arm.wristGoToPosition(wristDesiredPosition);
         else
             arm.wristManual(wristPower);
 
@@ -61,7 +60,7 @@ public class ArmTeleop extends OpMode {
 
         arm.update();
 
-        telemetry.addData("arm ticks", arm.getArmPosition());
+        telemetry.addData("arm position", arm.getArmPosition());
         telemetry.addData("wrist position", arm.getWristPosition());
         telemetry.addData("loop time millis", loopTimer.time());
         telemetry.update();

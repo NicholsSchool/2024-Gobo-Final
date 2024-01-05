@@ -9,8 +9,8 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.teamcode.other.Constants;
 
 //TODO: fix and tune arm go to position and governor
-//TODO: tune wrist go to position and governor manually, NEED BETTER WRIST IT SUCKS
-//TODO: tune fourbar switching angle
+//TODO: tune wrist go to position and governor manually
+//TODO: fiddle with the fourbar switching angle
 
 /**
  * Robot Arm Subsystem
@@ -110,7 +110,7 @@ public class Arm {
      * @param power the input motor power
      */
     public void wristManual(double power) {
-        wrist.setPower(Range.clip(power, -0.03, 0.03));
+        wrist.setPower(Range.clip(power, -0.025, 0.025));
     }
 
     /**
@@ -127,20 +127,19 @@ public class Arm {
      *
      * @param position the target encoder position
      */
-    public void wristGoToPosition(int position, double p) { //TODO: remove p
-        wristManual(p * (position - wrist.getCurrentPosition()));
+    public void wristGoToPosition(int position) {
+        wristManual(0.005 * (position - wrist.getCurrentPosition()));
     }
 
-    //TODO: uncomment
-//    /**
-//     * Moves the wrist to the intaking or scoring angle automatically
-//     */
-//    public void wristFourbar() {
-//        final int CORE_HEX_TICKS_PER_REV = 288;
-//
-//        if(getArmPosition() <= 300)
-//            wristGoToPosition((int)Math.round(-getArmPosition() * CORE_HEX_TICKS_PER_REV * 1.0 / Constants.THRU_BORE_TICKS_PER_REV));
-//        else
-//            wristGoToPosition((int)Math.round(48 - getArmPosition() * CORE_HEX_TICKS_PER_REV * 1.0 / Constants.THRU_BORE_TICKS_PER_REV));
-//    }
+    /**
+     * Moves the wrist to the intaking or scoring angle automatically
+     */
+    public void wristFourbar() {
+        final int CORE_HEX_TICKS_PER_REV = 288;
+
+        if(getArmPosition() <= 300)
+            wristGoToPosition((int)Math.round(-getArmPosition() * CORE_HEX_TICKS_PER_REV * 1.0 / Constants.THRU_BORE_TICKS_PER_REV));
+        else
+            wristGoToPosition((int)Math.round(48 - getArmPosition() * CORE_HEX_TICKS_PER_REV * 1.0 / Constants.THRU_BORE_TICKS_PER_REV));
+    }
 }
