@@ -18,7 +18,7 @@ public class TrapezoidProfile {
      * Instantiates the Profile with the default values
      */
     public TrapezoidProfile() {
-        this(0.0, -1.0, 1.0, 0.5);
+        this(0.0, -1.0, 1.0, 1.0);
     }
 
     /**

@@ -17,12 +17,6 @@ Consider tighten front odometry, loosen all wheels. Consider re-drilling if prob
 If ever necessary, use the NavX over the internal IMU
 
 
-Verified:
-Controller and Profile Classes  (tuning needed)
-Hand
-Lights                          (need to switch out right side)
-Arm                             (tuning needed)
-
-Unfinished/Untested:
-Drivetrain
-Vision
+Do Vision
+Test and Tune Drivetrain
+Test and Tune Arm

@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.teamcode.other.Constants;
 
 //TODO: fix and tune arm go to position and governor
-//TODO: tune wrist go to position and governor manually
+//TODO: redo wrist code for new motor, tune go to position and governor manually
 //TODO: fiddle with the fourbar switching angle
 
 /**

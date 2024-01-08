@@ -8,13 +8,14 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.other.AngleMath;
+import org.firstinspires.ftc.teamcode.other.CoordinateTrapezoidProfile;
+import org.firstinspires.ftc.teamcode.other.TrapezoidProfile;
 
-//TODO: add april tags pose updating, figure out how to make heading offset work
-
-//TODO: drive motor tuning teleop
+//TODO: edit scoring and intaking waypoints
 //TODO: odometry tuning
 //TODO: tune both profiles
-//TODO: edit spline waypoints for the new bot
+//TODO: drive motor tuning
+//TODO: why is the loop time so high?
 
 /**
  * Robot Drivetrain Subsystem
@@ -31,8 +32,8 @@ public class Drivetrain {
     private final double SPLINE_P = 0.05;
     private final double SPLINE_ERROR = 2.0;
     private final double SPLINE_GOVERNOR = 1.0;
-    private final double LEFT_WAYPOINT_X = -16.0;
-    private final double RIGHT_WAYPOINT_X = 40.0;
+    private final double LEFT_WAYPOINT_X = -14.0;
+    private final double RIGHT_WAYPOINT_X = 38.0;
     private final double BLUE_WAYPOINT_Y = 36.0;
     private final double RED_WAYPOINT_Y = -36.0;
 
@@ -41,6 +42,10 @@ public class Drivetrain {
     private final BHI260IMU imu;
     private int previousLeftPosition, previousRightPosition, previousFrontPosition;
     private double x, y, heading, imuOffset, desiredHeading;
+    private final CoordinateTrapezoidProfile driveProfile;
+    private final CoordinateTrapezoidProfile positionProfile;
+    private final TrapezoidProfile turnProfile;
+    private final TrapezoidProfile headingProfile;
 
     /**
      * Initializes the Drivetrain subsystem
@@ -57,7 +62,7 @@ public class Drivetrain {
         this.y = y;
         this.imuOffset = imuOffset;
         this.heading = imuOffset;
-        this.desiredHeading = heading;
+        this.desiredHeading = imuOffset;
 
         leftDrive = hwMap.get(DcMotorEx.class, "leftDrive");
         rightDrive = hwMap.get(DcMotorEx.class, "rightDrive");
@@ -94,20 +99,16 @@ public class Drivetrain {
         rightOdometry.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         frontOdometry.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
 
-//        leftDrive.setVelocityPIDFCoefficients(0.0, 0.0, 0.0, BACK_LEFT_F);
-//        rightDrive.setVelocityPIDFCoefficients(0.0, 0.0, 0.0, BACK_RIGHT_F);
-//        backDrive.setVelocityPIDFCoefficients(0.0, 0.0, 0.0, FRONT_LEFT_F);
-
-        BHI260IMU.Parameters params = new BHI260IMU.Parameters(
-                new RevHubOrientationOnRobot(
-                        RevHubOrientationOnRobot.LogoFacingDirection.DOWN,
-                        RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD
-                )
-        );
-
         imu = hwMap.get(BHI260IMU.class, "imu");
-        imu.initialize(params);
+        imu.initialize(new BHI260IMU.Parameters(new RevHubOrientationOnRobot(
+                        RevHubOrientationOnRobot.LogoFacingDirection.DOWN,
+                        RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD)));
         imu.resetYaw();
+
+        driveProfile = new CoordinateTrapezoidProfile();
+        turnProfile = new TrapezoidProfile();
+        positionProfile = new CoordinateTrapezoidProfile(x, y, -72.0, 72.0, 60.0);
+        headingProfile = new TrapezoidProfile(imuOffset, -1000.0, 1000.0, 720.0);
     }
 
     /**
@@ -131,11 +132,15 @@ public class Drivetrain {
      */
     public void drive(double power, double angle, double turn, boolean autoAlign) {
         if(autoAlign)
-            turn = turnToAngle();
+            turn = turnProfile.update(turnToAngle());
         else
-            turn = Range.clip(turn, -0.25, 0.25);
+            turn = turnProfile.update(Range.clip(turn, -0.25, 0.25));
 
         power = Range.clip(power, turn - 1.0, 1.0 - turn);
+        double angleRadians = Math.toRadians(angle);
+        double[] xy = driveProfile.update(power * Math.cos(angleRadians), power * Math.sin(angleRadians));
+        power = Range.clip(Math.hypot(xy[0], xy[1]), 0.0, 1.0);
+        angle = Math.atan2(xy[1], xy[0]);
 
         leftDrive.setVelocity((turn + power * Math.cos(Math.toRadians(angle - 60.0 + 90.0 - heading))) * MAX_MOTOR_VEL);
         rightDrive.setVelocity((turn + power * Math.cos(Math.toRadians(angle + 60.0 + 90.0 - heading))) * MAX_MOTOR_VEL);
@@ -179,7 +184,7 @@ public class Drivetrain {
         if(x == wx)
             return toIntake ? 0.0 : -180.0;
         double offset = x > wx ? -180.0 : 0.0;
-        return Math.toDegrees(Math.atan(2.0 * (y - wy) / (x - wx) ) ) + offset;
+        return Math.toDegrees(Math.atan(2.0 * (y - wy) / (x - wx))) + offset;
     }
 
     /**
@@ -207,7 +212,7 @@ public class Drivetrain {
 
         double k = (wy * robotDiff - y * waypointDiff) / (robotDiff - waypointDiff);
         double offset = x > wx ? -180.0 : 0.0;
-        return Math.toDegrees(Math.atan(2.0 * (y - k) / (x - h) ) ) + offset;
+        return Math.toDegrees(Math.atan(2.0 * (y - k) / (x - h))) + offset;
     }
 
     /**
@@ -218,6 +223,7 @@ public class Drivetrain {
         double INTAKE_X = 60.0;
         double BLUE_INTAKE_Y = 60.0;
         double RED_INTAKE_Y = -60.0;
+
         double distance = Math.sqrt(Math.pow(INTAKE_X - x, 2) +
                 Math.pow(isBlueAlliance ? BLUE_INTAKE_Y - y : RED_INTAKE_Y - y, 2) );
         double power = distance >= SPLINE_ERROR ?
@@ -240,6 +246,7 @@ public class Drivetrain {
      */
     public void splineToScoring(double turn, boolean autoAlign, double scoringY) {
         double SCORING_X = -44.0;
+
         double distance = Math.sqrt(Math.pow(SCORING_X - x, 2) +
                 Math.pow(scoringY - y, 2) );
         double power = distance >= SPLINE_ERROR ?
@@ -287,6 +294,20 @@ public class Drivetrain {
         previousLeftPosition = currentLeft;
         previousRightPosition = currentRight;
         previousFrontPosition = currentFront;
+    }
+
+    /**
+     * Sets the Robot Pose using the IMU offset
+     *
+     * @param pose the x, y, theta of the robot
+     */
+    public void setPose(double[] pose) {
+        double[] xy = positionProfile.update(pose[0], pose[1]);
+        x = xy[0];
+        y = xy[1];
+
+        imuOffset = AngleMath.addAngles(headingProfile.update(
+                pose[2] - imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES)), 0.0);
     }
 
     /**

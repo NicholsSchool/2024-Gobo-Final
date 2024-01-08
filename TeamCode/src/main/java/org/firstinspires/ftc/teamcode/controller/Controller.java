@@ -12,9 +12,6 @@ import org.firstinspires.ftc.teamcode.other.TrapezoidProfile;
 public class Controller {
     private final Gamepad gamepad;
 
-    private final CoordinateTrapezoidProfile leftJoystickProfile;
-    private final TrapezoidProfile rightXProfile;
-
     public Button leftBumper;
     public Button rightBumper;
     public Button dpadUp;
@@ -44,9 +41,6 @@ public class Controller {
      */
     public Controller(Gamepad gamepad) {
         this.gamepad = gamepad;
-
-        leftJoystickProfile = new CoordinateTrapezoidProfile();
-        rightXProfile =  new TrapezoidProfile();
         
         leftBumper = new Button();
         rightBumper = new Button();
@@ -90,10 +84,9 @@ public class Controller {
         leftStick.update(gamepad.left_stick_button);
         rightStick.update(gamepad.right_stick_button);
 
-        double[] leftStick = leftJoystickProfile.update(gamepad.left_stick_x, -gamepad.left_stick_y);
-        leftStickX.update(leftStick[0]);
-        leftStickY.update(leftStick[1]);
-        rightStickX.update(rightXProfile.update(gamepad.right_stick_x));
+        leftStickX.update(gamepad.left_stick_x);
+        leftStickY.update(-gamepad.left_stick_y);
+        rightStickX.update(gamepad.right_stick_x);
         rightStickY.update(-gamepad.right_stick_y);
         leftTrigger.update(gamepad.left_trigger);
         rightTrigger.update(gamepad.right_trigger);
