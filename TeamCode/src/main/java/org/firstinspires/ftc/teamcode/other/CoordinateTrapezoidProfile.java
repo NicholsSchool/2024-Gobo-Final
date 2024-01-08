@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 /**
- * A Profile for Smoothing Changing Coordinates
+ * A Profile for Smoothing Point Movements on a Coordinate Plane
  */
 public class CoordinateTrapezoidProfile {
     private final ElapsedTime timer;

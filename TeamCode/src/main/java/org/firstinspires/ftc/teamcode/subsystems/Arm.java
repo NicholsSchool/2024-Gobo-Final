@@ -8,9 +8,9 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.other.Constants;
 
-//TODO: fix and tune arm go to position and governor
-//TODO: redo wrist code for new motor, tune go to position and governor manually
-//TODO: fiddle with the fourbar switching angle
+//TODO: tune arm go to position and governor
+//TODO: modify wrist code for new motor, tune go to position and governor
+//TODO: tune fourbar switching angle
 
 /**
  * Robot Arm Subsystem
@@ -21,7 +21,6 @@ public class Arm {
     private final DcMotorEx wrist;
     private final Servo planeLauncher;
     private final ElapsedTime timer;
-    private double previousArmPosition;
 
     /**
      * Initializes the Arm
@@ -50,14 +49,6 @@ public class Arm {
         planeLauncher.scaleRange(0.35, 1.0);
 
         timer = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
-    }
-
-    /**
-     * Updates data for arm go to position control
-     */
-    public void update() {
-        previousArmPosition = getArmPosition();
-        timer.reset();
     }
 
     /**
@@ -99,9 +90,8 @@ public class Arm {
 
         double power = 0.0005 * (desiredPosition - position);
         double scalingFactor = 0.000022 * (2850 - position);
-        double dampening = 0.0000044 * (position - previousArmPosition) / timer.time();
 
-        shoulderManual(power + scalingFactor - dampening);
+        shoulderManual(power + scalingFactor);
     }
 
     /**
@@ -127,7 +117,7 @@ public class Arm {
      *
      * @param position the target encoder position
      */
-    public void wristGoToPosition(int position) {
+    public void wristGoToPosition(double position) {
         wristManual(0.005 * (position - wrist.getCurrentPosition()));
     }
 
@@ -135,11 +125,11 @@ public class Arm {
      * Moves the wrist to the intaking or scoring angle automatically
      */
     public void wristFourbar() {
-        final int CORE_HEX_TICKS_PER_REV = 288;
+        final double CORE_HEX_TICKS_PER_REV = 288;
 
         if(getArmPosition() <= 300)
-            wristGoToPosition((int)Math.round(-getArmPosition() * CORE_HEX_TICKS_PER_REV * 1.0 / Constants.THRU_BORE_TICKS_PER_REV));
+            wristGoToPosition(Math.round(-getArmPosition() * CORE_HEX_TICKS_PER_REV / Constants.THRU_BORE_TICKS_PER_REV));
         else
-            wristGoToPosition((int)Math.round(48 - getArmPosition() * CORE_HEX_TICKS_PER_REV * 1.0 / Constants.THRU_BORE_TICKS_PER_REV));
+            wristGoToPosition(Math.round(48.0 - getArmPosition() * CORE_HEX_TICKS_PER_REV / Constants.THRU_BORE_TICKS_PER_REV));
     }
 }

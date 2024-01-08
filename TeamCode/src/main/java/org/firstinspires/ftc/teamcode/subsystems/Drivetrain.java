@@ -12,21 +12,20 @@ import org.firstinspires.ftc.teamcode.other.CoordinateTrapezoidProfile;
 import org.firstinspires.ftc.teamcode.other.TrapezoidProfile;
 
 //TODO: edit scoring and intaking waypoints
-//TODO: odometry tuning
-//TODO: tune both profiles
-//TODO: drive motor tuning
-//TODO: why is the loop time so high?
+//TODO: tune the odometry
+//TODO: tune all 4 smoothing profiles starting values
+//TODO: tune auto align and spline
 
 /**
  * Robot Drivetrain Subsystem
  */
 public class Drivetrain {
-    public final double BLUE_SCORING_Y_CLOSE = -42.0;
-    public final double BLUE_SCORING_Y_MED = -36.0;
-    public final double BLUE_SCORING_Y_FAR = -30.0;
-    public final double RED_SCORING_Y_CLOSE = 42.0;
-    public final double RED_SCORING_Y_MED = 36.0;
-    public final double RED_SCORING_Y_FAR = 30.0;
+    public static final double BLUE_SCORING_Y_CLOSE = -42.0;
+    public static final double BLUE_SCORING_Y_MID = -36.0;
+    public static final double BLUE_SCORING_Y_FAR = -30.0;
+    public static final double RED_SCORING_Y_FAR = 30.0;
+    public static final double RED_SCORING_Y_MID = 36.0;
+    public static final double RED_SCORING_Y_CLOSE = 42.0;
 
     private final int MAX_MOTOR_VEL = 2800;
     private final double SPLINE_P = 0.05;
@@ -43,8 +42,8 @@ public class Drivetrain {
     private int previousLeftPosition, previousRightPosition, previousFrontPosition;
     private double x, y, heading, imuOffset, desiredHeading;
     private final CoordinateTrapezoidProfile driveProfile;
-    private final CoordinateTrapezoidProfile positionProfile;
     private final TrapezoidProfile turnProfile;
+    private final CoordinateTrapezoidProfile positionProfile;
     private final TrapezoidProfile headingProfile;
 
     /**
@@ -54,7 +53,7 @@ public class Drivetrain {
      * @param isBlueAlliance true for blue, false for red
      * @param x the initial x coordinate
      * @param y the initial y coordinate
-     * @param imuOffset the initial value for the heading
+     * @param imuOffset the initial value for the robot heading
      */
     public Drivetrain(HardwareMap hwMap, boolean isBlueAlliance, double x, double y, double imuOffset) {
         this.isBlueAlliance = isBlueAlliance;
@@ -123,7 +122,7 @@ public class Drivetrain {
     }
 
     /**
-     * Drives the robot with full functionality
+     * Drives the robot field oriented
      *
      * @param power the driving power proportion
      * @param angle the angle to drive at in degrees
@@ -224,8 +223,7 @@ public class Drivetrain {
         double BLUE_INTAKE_Y = 60.0;
         double RED_INTAKE_Y = -60.0;
 
-        double distance = Math.sqrt(Math.pow(INTAKE_X - x, 2) +
-                Math.pow(isBlueAlliance ? BLUE_INTAKE_Y - y : RED_INTAKE_Y - y, 2) );
+        double distance = Math.hypot(INTAKE_X - x, isBlueAlliance ? BLUE_INTAKE_Y - y : RED_INTAKE_Y - y);
         double power = distance >= SPLINE_ERROR ?
                 Range.clip(SPLINE_P * distance, -SPLINE_GOVERNOR, SPLINE_GOVERNOR) : 0.0;
 
@@ -247,8 +245,7 @@ public class Drivetrain {
     public void splineToScoring(double turn, boolean autoAlign, double scoringY) {
         double SCORING_X = -44.0;
 
-        double distance = Math.sqrt(Math.pow(SCORING_X - x, 2) +
-                Math.pow(scoringY - y, 2) );
+        double distance = Math.hypot(SCORING_X - x, scoringY - y);
         double power = distance >= SPLINE_ERROR ?
                 Range.clip(SPLINE_P * distance, -SPLINE_GOVERNOR, SPLINE_GOVERNOR) : 0.0;
 
@@ -288,8 +285,8 @@ public class Drivetrain {
         double deltaY = deltaFront * INCHES_PER_TICK * FORWARD_ODOMETRY_CORRECTION;
 
         double inRadians = Math.toRadians(heading);
-        y += -deltaX * Math.cos(inRadians) + deltaY * Math.sin(inRadians);
         x += deltaX * Math.sin(inRadians) + deltaY * Math.cos(inRadians);
+        y += -deltaX * Math.cos(inRadians) + deltaY * Math.sin(inRadians);
 
         previousLeftPosition = currentLeft;
         previousRightPosition = currentRight;

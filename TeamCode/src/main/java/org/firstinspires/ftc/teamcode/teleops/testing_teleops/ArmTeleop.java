@@ -58,8 +58,6 @@ public class ArmTeleop extends OpMode {
 
         arm.launchPlane(launchPlane);
 
-        arm.update();
-
         telemetry.addData("arm position", arm.getArmPosition());
         telemetry.addData("wrist position", arm.getWristPosition());
         telemetry.addData("loop time millis", loopTimer.time());

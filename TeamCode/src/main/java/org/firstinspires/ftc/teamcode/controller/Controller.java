@@ -3,9 +3,6 @@ package org.firstinspires.ftc.teamcode.controller;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.teamcode.other.CoordinateTrapezoidProfile;
-import org.firstinspires.ftc.teamcode.other.TrapezoidProfile;
-
 /**
  * The Controller containing Button and Axis objects
  */
@@ -93,20 +90,15 @@ public class Controller {
     }
 
     /**
-     * The Radius Value of the Left Joystick
+     * The Radius and Angle Values of the Left Joystick
      *
-     * @return the hypotenuse length of x and y
+     * @return the r, theta transformation of the joystick
      */
-    public double leftStickRadius() {
-        return Range.clip(Math.hypot(leftStickX.getValue(), leftStickY.getValue()), 0.0, 1.0);
-    }
-
-    /**
-     * The Theta Value of the Left Joystick
-     *
-     * @return the angle in degrees
-     */
-    public double leftStickTheta() {
-        return Math.toDegrees(Math.atan2(leftStickY.getValue(), leftStickX.getValue()));
+    public double[] leftStick() {
+        double x = leftStickX.getValue();
+        double y = leftStickY.getValue();
+        return new double[]{
+                Range.clip(Math.hypot(x, y), 0.0, 1.0),
+                Math.toDegrees(Math.atan2(y, x))};
     }
 }
