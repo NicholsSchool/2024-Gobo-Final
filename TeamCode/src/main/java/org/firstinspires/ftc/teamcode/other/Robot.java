@@ -35,16 +35,12 @@ public class Robot {
      * Full Robot functionalities. Call in each loop()
      */
     public void update() {
-        updatePrior();
-
+        updateInstances();
         teleopLogic();
-
         outputTelemetry();
-
-        updateAfter();
     }
 
-    private void updatePrior() {
+    private void updateInstances() {
         driverOI.update();
         operatorOI.update();
     }
@@ -55,10 +51,7 @@ public class Robot {
 
     private void outputTelemetry() {
         telemetry.addData("loop time", loopTimer.time());
-        telemetry.update();
-    }
-
-    private void updateAfter() {
         loopTimer.reset();
+        telemetry.update();
     }
 }

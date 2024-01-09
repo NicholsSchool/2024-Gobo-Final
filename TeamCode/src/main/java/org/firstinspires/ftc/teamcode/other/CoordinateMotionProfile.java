@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.util.Range;
 /**
  * A Motion Profile for a Point on a Coordinate Plane
  */
-public class CoordinateTrapezoidProfile {
+public class CoordinateMotionProfile {
     private final ElapsedTime timer;
     private final double minValue;
     private final double maxValue;
@@ -18,8 +18,8 @@ public class CoordinateTrapezoidProfile {
     /**
      * Instantiates the Profile with the default values
      */
-    public CoordinateTrapezoidProfile() {
-        this(0.0, 0.0, -1.0, 1.0, 2.0);
+    public CoordinateMotionProfile() {
+        this(0.0, 0.0, -1.0, 1.0, 3.0);
     }
 
     /**
@@ -31,7 +31,7 @@ public class CoordinateTrapezoidProfile {
      * @param max the maximum value
      * @param maxSpeed the maximum change per second
      */
-    public CoordinateTrapezoidProfile(double initialX, double initialY, double min, double max, double maxSpeed) {
+    public CoordinateMotionProfile(double initialX, double initialY, double min, double max, double maxSpeed) {
         timer = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
         previousX = initialX;
         previousY = initialY;
@@ -51,6 +51,8 @@ public class CoordinateTrapezoidProfile {
      */
     public double[] update(double newX, double newY) {
         double time = timer.time();
+        timer.reset();
+
         double change = Math.hypot(newX - previousX, newY - previousY);
 
         double[] result;
@@ -68,7 +70,6 @@ public class CoordinateTrapezoidProfile {
         previousX = result[0];
         previousY = result[1];
 
-        timer.reset();
         return result;
     }
 }

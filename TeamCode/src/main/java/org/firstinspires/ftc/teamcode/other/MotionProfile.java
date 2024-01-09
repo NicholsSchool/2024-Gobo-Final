@@ -4,9 +4,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 /**
- * A trapezoid Profiler for smoothing changing values
+ * A simple Motion Profiler for smoothing changes to a value
  */
-public class TrapezoidProfile {
+public class MotionProfile {
     private final ElapsedTime timer;
     private final double minValue;
     private final double maxValue;
@@ -17,7 +17,7 @@ public class TrapezoidProfile {
     /**
      * Instantiates the Profile with the default values
      */
-    public TrapezoidProfile() {
+    public MotionProfile() {
         this(0.0, -0.25, 0.25, 1.0);
     }
 
@@ -29,7 +29,7 @@ public class TrapezoidProfile {
      * @param max the maximum value
      * @param maxSpeed the maximum change per second
      */
-    public TrapezoidProfile(double initialValue, double min, double max, double maxSpeed) {
+    public MotionProfile(double initialValue, double min, double max, double maxSpeed) {
         timer = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
         previousValue = initialValue;
         minValue = min;
@@ -47,6 +47,8 @@ public class TrapezoidProfile {
      */
     public double update(double newValue) {
         double time = timer.time();
+        timer.reset();
+
         double change = newValue - previousValue;
 
         double maxChange = maxSpeed * time;
@@ -59,8 +61,6 @@ public class TrapezoidProfile {
             result = Range.clip(newValue, minValue, maxValue);
 
         previousValue = result;
-
-        timer.reset();
         return result;
     }
 }

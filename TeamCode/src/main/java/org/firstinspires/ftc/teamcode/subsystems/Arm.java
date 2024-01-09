@@ -5,11 +5,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.teamcode.other.Constants;
-
 //TODO: tune arm go to position and governor
-//TODO: modify wrist code for new motor, tune go to position, governor, fourbar switch angle
-//TODO: decide if we are resorting to raw power
+//TODO: tune wrist governor
 
 /**
  * Robot Arm Subsystem
@@ -68,6 +65,14 @@ public class Arm {
     }
 
     /**
+     * Climbs at Max Shoulder Power
+     */
+    public void climb() {
+        leftShoulder.setPower(1.0);
+        rightShoulder.setPower(1.0);
+    }
+
+    /**
      * The angle of the arm measured in thru bore ticks
      *
      * @return the encoder position of the arm
@@ -96,36 +101,6 @@ public class Arm {
      * @param power the input motor power
      */
     public void wristManual(double power) {
-        wrist.setPower(Range.clip(power, -0.025, 0.025));
-    }
-
-    /**
-     * The wrist encoder position
-     *
-     * @return the position
-     */
-    public int getWristPosition() {
-        return wrist.getCurrentPosition();
-    }
-
-    /**
-     * Moves the wrist to the given position
-     *
-     * @param position the target encoder position
-     */
-    public void wristGoToPosition(double position) {
-        wristManual(0.005 * (position - wrist.getCurrentPosition()));
-    }
-
-    /**
-     * Moves the wrist to the intaking or scoring angle automatically
-     */
-    public void wristFourbar() {
-        final double CORE_HEX_TICKS_PER_REV = 288;
-
-        if(getArmPosition() <= 300)
-            wristGoToPosition(Math.round(-getArmPosition() * CORE_HEX_TICKS_PER_REV / Constants.THRU_BORE_TICKS_PER_REV));
-        else
-            wristGoToPosition(Math.round(48.0 - getArmPosition() * CORE_HEX_TICKS_PER_REV / Constants.THRU_BORE_TICKS_PER_REV));
+        wrist.setPower(Range.clip(power, -0.5, 0.5));
     }
 }

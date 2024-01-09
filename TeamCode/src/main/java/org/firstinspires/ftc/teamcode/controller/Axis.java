@@ -5,33 +5,24 @@ import androidx.annotation.NonNull;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
- * An Axis on a Controller (triggers and joysticks)
+ * An Axis on a Controller
  */
 public class Axis {
-    /** The default Joystick deadband */
-    public static final double DEFAULT_DEADBAND = 0.005;
     private final ElapsedTime timer;
-    private double value;
     private final double deadband;
+    private double value;
 
     /**
-     * Instantiates an Axis with the default deadband
+     * Instantiates the Axis
      */
     public Axis() {
-        this(DEFAULT_DEADBAND);
-    }
-
-    /**
-     * Instantiates an Axis with the specified deadband
-     */
-    public Axis(double desiredDeadband) {
         timer = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
+        deadband = 0.01;
         value = 0.0;
-        deadband = desiredDeadband;
     }
 
     /**
-     * Updates the Axis with the new state using the deadband
+     * Updates the Axis with the new state applied through the deadband
      */
     public void update(double newValue) {
         value = Math.abs(newValue) >= deadband ? newValue : 0.0;

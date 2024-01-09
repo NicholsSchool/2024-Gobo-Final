@@ -52,8 +52,6 @@ public class ControllerTeleop extends OpMode {
         dashboard.sendTelemetryPacket(packet);
 
         telemetry.addData("loop time millis", loopTimer.time());
-
-        telemetry.update();
         loopTimer.reset();
-    }
+        telemetry.update();}
 }

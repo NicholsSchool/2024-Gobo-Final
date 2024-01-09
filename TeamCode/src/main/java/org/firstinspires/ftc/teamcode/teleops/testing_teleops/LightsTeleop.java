@@ -50,8 +50,7 @@ public class LightsTeleop extends OpMode {
         }
 
         telemetry.addData("loop time millis", loopTimer.time());
-        telemetry.update();
-
         loopTimer.reset();
+        telemetry.update();
     }
 }

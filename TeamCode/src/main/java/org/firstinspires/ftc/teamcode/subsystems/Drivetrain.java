@@ -8,14 +8,14 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.other.AngleMath;
-import org.firstinspires.ftc.teamcode.other.CoordinateTrapezoidProfile;
-import org.firstinspires.ftc.teamcode.other.TrapezoidProfile;
+import org.firstinspires.ftc.teamcode.other.CoordinateMotionProfile;
+import org.firstinspires.ftc.teamcode.other.MotionProfile;
 
-//TODO: edit scoring and intaking waypoints
-//TODO: tune the odometry
-//TODO: tune the drive motors
+//TODO: tune the odometry correction
+//TODO: tune the drive motors ff
 //TODO: tune the motion profile constants
-//TODO: tune auto align and spline
+//TODO: tune auto align and spline constants
+//TODO: edit scoring and intaking waypoints
 
 /**
  * Robot Drivetrain Subsystem
@@ -39,8 +39,8 @@ public class Drivetrain {
     private final boolean isBlueAlliance;
     private final DcMotorEx leftDrive, rightDrive, backDrive, frontOdometry, leftOdometry, rightOdometry;
     private final BHI260IMU imu;
-    private final CoordinateTrapezoidProfile driveProfile;
-    private final TrapezoidProfile turnProfile;
+    private final CoordinateMotionProfile driveProfile;
+    private final MotionProfile turnProfile;
     private int previousLeftPosition, previousRightPosition, previousFrontPosition;
     private double x, y, heading, imuOffset, desiredHeading;
 
@@ -78,9 +78,6 @@ public class Drivetrain {
         leftDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         rightDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         backDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-//        leftDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-//        rightDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-//        backDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
 
         leftDrive.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         rightDrive.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -102,8 +99,8 @@ public class Drivetrain {
                         RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD)));
         imu.resetYaw();
 
-        driveProfile = new CoordinateTrapezoidProfile();
-        turnProfile = new TrapezoidProfile();
+        driveProfile = new CoordinateMotionProfile();
+        turnProfile = new MotionProfile();
     }
 
     /**
@@ -115,6 +112,15 @@ public class Drivetrain {
         leftDrive.setVelocity(power * MAX_MOTOR_VEL);
         rightDrive.setVelocity(power * MAX_MOTOR_VEL);
         backDrive.setVelocity(power * MAX_MOTOR_VEL);
+    }
+
+    /**
+     * Sets the Drive Wheels to Float Zero Power Behavior
+     */
+    public void setFloat() {
+        leftDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+        rightDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+        backDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
     }
 
     /**
@@ -137,9 +143,9 @@ public class Drivetrain {
         power = Math.hypot(xy[0], xy[1]);
         angle = Math.toDegrees(Math.atan2(xy[1], xy[0]));
 
-        leftDrive.setVelocity((turn + power * Math.cos(Math.toRadians(angle - 60.0 + 90.0 - heading))) * MAX_MOTOR_VEL);
-        rightDrive.setVelocity((turn + power * Math.cos(Math.toRadians(angle + 60.0 + 90.0 - heading))) * MAX_MOTOR_VEL);
-        backDrive.setVelocity((turn + power * Math.cos((Math.toRadians(angle + 180.0 + 90.0 - heading)))) * MAX_MOTOR_VEL);
+        leftDrive.setVelocity((turn + power * Math.cos(Math.toRadians(angle + 30.0 - heading))) * MAX_MOTOR_VEL);
+        rightDrive.setVelocity((turn + power * Math.cos(Math.toRadians(angle + 150.0 - heading))) * MAX_MOTOR_VEL);
+        backDrive.setVelocity((turn + power * Math.cos((Math.toRadians(angle + 270.0 - heading)))) * MAX_MOTOR_VEL);
     }
 
     /**
@@ -151,13 +157,13 @@ public class Drivetrain {
         double error = AngleMath.addAngles(heading, -desiredHeading);
         if(Math.abs(error) < 0.5)
             return 0.0;
-        return Range.clip(error * 0.0075, -0.25, 0.25);
+        return Range.clip(error * 0.005, -0.25, 0.25);
     }
 
     /**
      * Sets the heading to auto-align to
      *
-     * @param desiredHeading the heading in degrees [-180, 180)
+     * @param desiredHeading the heading in degrees
      */
     public void setDesiredHeading(double desiredHeading) {
         this.desiredHeading = desiredHeading;
@@ -215,9 +221,9 @@ public class Drivetrain {
      * area using parabolas in piecewise.
      */
     public void splineToIntake(double turn, boolean autoAlign) {
-        double INTAKE_X = 60.0;
-        double BLUE_INTAKE_Y = 60.0;
-        double RED_INTAKE_Y = -60.0;
+        double INTAKE_X = 56.0;
+        double BLUE_INTAKE_Y = 56.0;
+        double RED_INTAKE_Y = -56.0;
 
         double distance = Math.hypot(INTAKE_X - x, isBlueAlliance ? BLUE_INTAKE_Y - y : RED_INTAKE_Y - y);
         double power = distance >= SPLINE_ERROR ? SPLINE_P * distance : 0.0;
@@ -238,7 +244,7 @@ public class Drivetrain {
      * area using parabolas in piecewise.
      */
     public void splineToScoring(double turn, boolean autoAlign, double scoringY) {
-        double SCORING_X = -44.0;
+        double SCORING_X = -42.0;
 
         double distance = Math.hypot(SCORING_X - x, scoringY - y);
         double power = distance >= SPLINE_ERROR ? SPLINE_P * distance : 0.0;
@@ -278,10 +284,10 @@ public class Drivetrain {
         double deltaX = (deltaLeft + deltaRight) * INCHES_PER_TICK * STRAFE_ODOMETRY_CORRECTION;
         double deltaY = deltaFront * INCHES_PER_TICK * FORWARD_ODOMETRY_CORRECTION;
 
-        double inRadians = Math.toRadians(heading);
+        double headingInRadians = Math.toRadians(heading);
 
-        x += deltaX * Math.sin(inRadians) + deltaY * Math.cos(inRadians);
-        y += -deltaX * Math.cos(inRadians) + deltaY * Math.sin(inRadians);
+        x += deltaX * Math.sin(headingInRadians) + deltaY * Math.cos(headingInRadians);
+        y += -deltaX * Math.cos(headingInRadians) + deltaY * Math.sin(headingInRadians);
 
         previousLeftPosition = currentLeft;
         previousRightPosition = currentRight;
@@ -297,7 +303,7 @@ public class Drivetrain {
         x = pose[0];
         y = pose[1];
         imuOffset = AngleMath.addAngles(pose[2],
-                imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
+                -imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
     }
 
     /**

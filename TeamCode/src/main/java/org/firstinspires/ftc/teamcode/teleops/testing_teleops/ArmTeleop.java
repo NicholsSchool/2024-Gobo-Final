@@ -22,10 +22,7 @@ public class ArmTeleop extends OpMode {
     public static double shoulderPower;
     public static boolean armGoToPos;
     public static int armDesiredPosition;
-    public static boolean isFourbar;
-    public static boolean wristGoToPos;
     public static double wristPower;
-    public static int wristDesiredPosition;
     public static boolean launchPlane;
 
     /**
@@ -49,20 +46,13 @@ public class ArmTeleop extends OpMode {
         else
             arm.shoulderManual(shoulderPower);
 
-        if(isFourbar)
-            arm.wristFourbar();
-        else if(wristGoToPos)
-            arm.wristGoToPosition(wristDesiredPosition);
-        else
-            arm.wristManual(wristPower);
-
+        arm.wristManual(wristPower);
         arm.launchPlane(launchPlane);
 
         telemetry.addData("arm position", arm.getArmPosition());
-        telemetry.addData("wrist position", arm.getWristPosition());
         telemetry.addData("loop time millis", loopTimer.time());
-        telemetry.update();
-
         loopTimer.reset();
+
+        telemetry.update();
     }
 }

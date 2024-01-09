@@ -40,8 +40,7 @@ public class HandTeleop extends OpMode {
         hand.rightGrabber(sync ? leftPos : rightPos);
 
         telemetry.addData("loop time millis", loopTimer.time());
-        telemetry.update();
-
         loopTimer.reset();
+        telemetry.update();
     }
 }

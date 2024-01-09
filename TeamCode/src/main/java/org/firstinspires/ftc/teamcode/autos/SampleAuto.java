@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
- * Sample Auto to Copy and Paste
+ * Sample Auto to Copy Paste Edit with
  */
 @Autonomous(name="CHANGE THIS NAME")
 public class SampleAuto extends LinearOpMode {

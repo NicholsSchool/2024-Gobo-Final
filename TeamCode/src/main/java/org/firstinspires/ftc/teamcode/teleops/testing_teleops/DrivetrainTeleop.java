@@ -22,7 +22,6 @@ public class DrivetrainTeleop extends OpMode {
     private ElapsedTime loopTimer;
     private Controller driverController;
     private Drivetrain drivetrain;
-    public static double spinSpeed;
 
     /**
      * Code to run ONCE when the driver hits INIT
@@ -83,8 +82,7 @@ public class DrivetrainTeleop extends OpMode {
         telemetry.addData("theta", drivetrain.getFieldHeading());
 
         telemetry.addData("loop time millis", loopTimer.time());
-        telemetry.update();
-
         loopTimer.reset();
+        telemetry.update();
     }
 }

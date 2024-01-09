@@ -41,9 +41,8 @@ public class SampleTeleop extends OpMode {
     @Override
     public void loop() {
         telemetry.addData("loop time millis", loopTimer.time());
-        telemetry.update();
-
         loopTimer.reset();
+        telemetry.update();
     }
 
     /**
