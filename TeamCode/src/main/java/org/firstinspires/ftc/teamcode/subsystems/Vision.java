@@ -1,10 +1,14 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-//TODO: redo and check all localization math with weighted average on size and distance
-//TODO: localization smoothing and camera exposure tuning
+//TODO: redo and check all localization math and weighted average based on size and distance
+//TODO: localization smoothing using profile
+//TODO: camera exposure tuning
 //TODO: decide after all that if small april tags are worth it
+//TODO: see if april tags tell you their position from their metadata
+
 //TODO: experiment with loop() times with pause/not calling the method, etc
 //TODO: test loop time with MJPEG format
+//TODO: separate method for camera 2, test loop times
 
 //TODO: put angle related math in the AngleMath class
 
@@ -83,8 +87,8 @@ public class Vision {
 //    }
 
     private double[] localize(int i, boolean isFrontCam) {
-        final double FRONT_CAM_FORWARD_DIST = 5.5; //TODO: fix these
-        final double FRONT_CAM_HORIZONTAL_DIST = 4.5;
+        final double FRONT_CAM_FORWARD_DIST = 5.5; //TODO: change this
+        final double FRONT_CAM_HORIZONTAL_DIST = 3.125;
 
         AprilTagDetection aprilTagDetection = detections.get(i);
 
@@ -92,9 +96,9 @@ public class Vision {
         double range = aprilTagDetection.ftcPose.range;
         double yaw = aprilTagDetection.ftcPose.yaw;
         double bearing = aprilTagDetection.ftcPose.bearing;
-        boolean isScoringTag = (id <= 6);
+        boolean isScoringTag = id <= 6;
 
-        double tagX = isScoringTag ? -61.5 : 72.0;
+        double tagX = isScoringTag ? -61.5 : 72.125;
         double tagY = getTagYCoordinate(id);
 
         double fieldHeading = isScoringTag ? AngleMath.addAngles(-yaw, -180.0) : -yaw;
@@ -108,9 +112,9 @@ public class Vision {
         double fieldHeadingInRadians = Math.toRadians(fieldHeading);
 
         double localizedX = cameraX - FRONT_CAM_FORWARD_DIST * Math.cos(fieldHeadingInRadians)
-                + FRONT_CAM_HORIZONTAL_DIST * Math.sin(fieldHeadingInRadians);
+                - FRONT_CAM_HORIZONTAL_DIST * Math.sin(fieldHeadingInRadians);
         double localizedY = cameraY - FRONT_CAM_HORIZONTAL_DIST * Math.cos(fieldHeadingInRadians)
-                - FRONT_CAM_FORWARD_DIST * Math.sin(fieldHeadingInRadians);
+                - FRONT_CAM_FORWARD_DIST * Math.sin(fieldHeadingInRadians); //TODO: check this too
 
         //TODO: change this and averaging logic
         return new double[] {localizedX, localizedY, fieldHeading, id == 7 || id == 10 ? 1.0 : 0.0};
