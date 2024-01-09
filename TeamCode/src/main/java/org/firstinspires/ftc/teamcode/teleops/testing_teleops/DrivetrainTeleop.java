@@ -7,8 +7,8 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.controller.Controller;
 import org.firstinspires.ftc.teamcode.other.Constants;
-import org.firstinspires.ftc.teamcode.other.TrapezoidProfile;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 
 //TODO: Test full drivetrain functionalities
@@ -20,9 +20,8 @@ import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 @TeleOp(name="[DASHBOARD] Drivetrain Testing")
 public class DrivetrainTeleop extends OpMode {
     private ElapsedTime loopTimer;
+    private Controller driverController;
     private Drivetrain drivetrain;
-    private TrapezoidProfile speedSmoothing;
-
     public static double spinSpeed;
 
     /**
@@ -30,8 +29,8 @@ public class DrivetrainTeleop extends OpMode {
      */
     @Override
     public void init() {
+        driverController = new Controller(gamepad1);
         drivetrain = new Drivetrain(hardwareMap, Constants.IS_BLUE_ALLIANCE, 0.0, 0.0, 90.0);
-        speedSmoothing = new TrapezoidProfile();
 
         loopTimer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -42,9 +41,30 @@ public class DrivetrainTeleop extends OpMode {
      */
     @Override
     public void loop() {
+        driverController.update();
         drivetrain.update();
 
-        drivetrain.simpleSpin(speedSmoothing.update(spinSpeed));
+        boolean autoAlign = driverController.rightStickX.zeroLongEnough();
+
+        if(!autoAlign)
+            drivetrain.setDesiredHeading(drivetrain.getFieldHeading());
+        else if(driverController.y.wasJustPressed())
+            drivetrain.setDesiredHeading(90.0);
+        else if(driverController.a.wasJustPressed())
+            drivetrain.setDesiredHeading(-90.0);
+        else if(driverController.b.wasJustPressed())
+            drivetrain.setDesiredHeading(0.0);
+        else if(driverController.x.wasJustPressed())
+            drivetrain.setDesiredHeading(-180.0);
+
+        double[] powerAngle = driverController.leftStick();
+        double turn = driverController.rightStickX.getValue();
+        drivetrain.drive(powerAngle[0], powerAngle[1], turn, autoAlign);
+
+        telemetry.addData("power", powerAngle[0]);
+        telemetry.addData("angle", powerAngle[1]);
+        telemetry.addData("turn", turn);
+        telemetry.addData("autoAlign", autoAlign);
 
         double[] velocities = drivetrain.getMotorVelocities();
         telemetry.addData("left vel", velocities[0]);
@@ -60,7 +80,7 @@ public class DrivetrainTeleop extends OpMode {
         telemetry.addData("x", xy[0]);
         telemetry.addData("y", xy[1]);
 
-        telemetry.addData("heading", drivetrain.getFieldHeading());
+        telemetry.addData("theta", drivetrain.getFieldHeading());
 
         telemetry.addData("loop time millis", loopTimer.time());
         telemetry.update();

@@ -3,14 +3,13 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.other.Constants;
 
 //TODO: tune arm go to position and governor
-//TODO: modify wrist code for new motor, tune go to position and governor
-//TODO: tune fourbar switching angle
+//TODO: modify wrist code for new motor, tune go to position, governor, fourbar switch angle
+//TODO: decide if we are resorting to raw power
 
 /**
  * Robot Arm Subsystem
@@ -20,7 +19,6 @@ public class Arm {
     private final DcMotorEx rightShoulder;
     private final DcMotorEx wrist;
     private final Servo planeLauncher;
-    private final ElapsedTime timer;
 
     /**
      * Initializes the Arm
@@ -47,8 +45,6 @@ public class Arm {
         planeLauncher = hardwareMap.get(Servo.class, "planeLauncher");
         planeLauncher.setDirection(Servo.Direction.FORWARD);
         planeLauncher.scaleRange(0.35, 1.0);
-
-        timer = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
     }
 
     /**

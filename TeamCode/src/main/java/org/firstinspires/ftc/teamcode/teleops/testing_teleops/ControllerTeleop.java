@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.controller.Controller;
  * Teleop for testing Controller and Profiling functionalities
  */
 @Config
-@TeleOp(name="Controller Testing")
+@TeleOp(name="[DASHBOARD] Controller Testing")
 public class ControllerTeleop extends OpMode {
     private Controller driverController;
     private ElapsedTime loopTimer;
@@ -44,16 +44,14 @@ public class ControllerTeleop extends OpMode {
         telemetry.addData("left stick x", leftX);
         telemetry.addData("left stick y", leftY);
 
-        telemetry.addData("right stick x", driverController.rightStickX);
-
-        telemetry.addData("loop time millis", loopTimer.time());
-
         TelemetryPacket packet = new TelemetryPacket(false);
         packet.fieldOverlay()
                 .drawGrid(0.0, 0.0, 144.0, 144.0, 21, 21)
                 .setFill("red")
                 .fillRect(leftY * 72, -leftX * 72, 7.2, 7.2);
         dashboard.sendTelemetryPacket(packet);
+
+        telemetry.addData("loop time millis", loopTimer.time());
 
         telemetry.update();
         loopTimer.reset();
