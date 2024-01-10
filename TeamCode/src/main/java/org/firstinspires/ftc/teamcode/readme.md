@@ -4,6 +4,8 @@ DO NOT RESET IMU AT THE START OF TELEOP FOR COMPETITION MATCHES, REMOVE THAT LIN
 Be mindful with loop times with each new functionality (especially IMU and Vision)
 Current Estimate: empty = 1-2 millis, arm 10-20 millis, drivetrain 30-40 millis
 
+AprilTagGameDatabase.java contains field positions of all tags
+
         TODOS...
 Make An Exact Order and Procedure for All Tuning
 

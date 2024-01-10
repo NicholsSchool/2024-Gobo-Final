@@ -42,7 +42,7 @@ public class Drivetrain {
     private final CoordinateMotionProfile driveProfile;
     private final MotionProfile turnProfile;
     private int previousLeftPosition, previousRightPosition, previousFrontPosition;
-    private double x, y, heading, imuOffset, desiredHeading;
+    private double x, y, heading, previousHeading, imuOffset, desiredHeading;
 
     /**
      * Initializes the Drivetrain subsystem
@@ -57,8 +57,9 @@ public class Drivetrain {
         this.isBlueAlliance = isBlueAlliance;
         this.x = x;
         this.y = y;
-        this.imuOffset = imuOffset;
         this.heading = imuOffset;
+        this.previousHeading = imuOffset;
+        this.imuOffset = imuOffset;
         this.desiredHeading = imuOffset;
 
         leftDrive = hwMap.get(DcMotorEx.class, "leftDrive");
@@ -270,9 +271,6 @@ public class Drivetrain {
         final double STRAFE_ODOMETRY_CORRECTION = 1.0;
         final double FORWARD_ODOMETRY_CORRECTION = 1.0;
 
-        heading = AngleMath.addAngles(
-                imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES), imuOffset);
-
         int currentLeft = leftOdometry.getCurrentPosition();
         int currentRight = rightOdometry.getCurrentPosition();
         int currentFront = frontOdometry.getCurrentPosition();
@@ -284,14 +282,18 @@ public class Drivetrain {
         double deltaX = (deltaLeft + deltaRight) * INCHES_PER_TICK * STRAFE_ODOMETRY_CORRECTION;
         double deltaY = deltaFront * INCHES_PER_TICK * FORWARD_ODOMETRY_CORRECTION;
 
-        double headingInRadians = Math.toRadians(heading);
+        heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) + imuOffset;
 
-        x += deltaX * Math.sin(headingInRadians) + deltaY * Math.cos(headingInRadians);
-        y += -deltaX * Math.cos(headingInRadians) + deltaY * Math.sin(headingInRadians);
+        double adjustedHeadingRadians = Math.toRadians((heading + previousHeading) * 0.5);
+
+        x += deltaX * Math.sin(adjustedHeadingRadians) + deltaY * Math.cos(adjustedHeadingRadians);
+        y += -deltaX * Math.cos(adjustedHeadingRadians) + deltaY * Math.sin(adjustedHeadingRadians);
 
         previousLeftPosition = currentLeft;
         previousRightPosition = currentRight;
         previousFrontPosition = currentFront;
+        previousHeading = heading;
+
     }
 
     /**
@@ -302,8 +304,7 @@ public class Drivetrain {
     public void setPose(double[] pose) {
         x = pose[0];
         y = pose[1];
-        imuOffset = AngleMath.addAngles(pose[2],
-                -imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
+        imuOffset = pose[2] - imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
     }
 
     /**
@@ -348,6 +349,6 @@ public class Drivetrain {
      * @return the heading in degrees
      */
     public double getFieldHeading() {
-        return heading;
+        return AngleMath.addAngles(heading, 0.0);
     }
 }

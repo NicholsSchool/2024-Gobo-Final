@@ -1,16 +1,12 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-//TODO: redo and check all localization math and weighted average based on size and distance
 //TODO: localization smoothing using profile
 //TODO: camera exposure tuning
 //TODO: decide after all that if small april tags are worth it
-//TODO: see if april tags tell you their position from their metadata
 
 //TODO: experiment with loop() times with pause/not calling the method, etc
 //TODO: test loop time with MJPEG format
 //TODO: separate method for camera 2, test loop times
-
-//TODO: put angle related math in the AngleMath class
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -39,105 +35,112 @@ public class Vision {
      */
     public Vision(HardwareMap hwMap) {
         processor = new AprilTagProcessor.Builder()
-                .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES).build();
+                .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
+                .build();
 
         portal = new VisionPortal.Builder()
                 .setCamera(hwMap.get(WebcamName.class, "Webcam 1"))
-                .setStreamFormat(VisionPortal.StreamFormat.YUY2).addProcessor(processor).build();
+                .setStreamFormat(VisionPortal.StreamFormat.YUY2)
+                .addProcessor(processor)
+                .build();
 
         detections = new ArrayList<>();
     }
 
-//    /**
-//     * Updates the Robot Vision, call in each loop
-//     *
-//     * @return the robot pose [x, y, theta] in inches and degrees
-//     */
-//    public double[] update() {
-//        detections = processor.getDetections();
-//
-//        double[] averagedPose = new double[4];
-//
-//        int frontSize = frontDetections.size();
-//        for(int i = 0; i < frontSize; i++) {
-//            double[] pose = localize(i, true);
-//            averagedPose[0] += pose[0];
-//            averagedPose[1] += pose[1];
-//            averagedPose[2] += pose[3] == 1 ? 5 * Math.cos( Math.toRadians(pose[2]) ) : Math.cos( Math.toRadians(pose[2]) );
-//            averagedPose[3] += pose[3] == 1 ? 5 * Math.sin( Math.toRadians(pose[2]) ) : Math.sin( Math.toRadians(pose[2]) );
-//        }
-//
-//        int backSize = backDetections.size();
-//        for(int i = 0; i < backSize; i++) {
-//            double[] pose = localize(i, false);
-//            averagedPose[0] += pose[0];
-//            averagedPose[1] += pose[1];
-//            averagedPose[2] += pose[3] == 1.0 ? 5 * Math.cos( Math.toRadians(pose[2]) ) : Math.cos( Math.toRadians(pose[2]) );
-//            averagedPose[3] += pose[3] == 1.0 ? 5 * Math.sin( Math.toRadians(pose[2]) ) : Math.sin( Math.toRadians(pose[2]) );
-//        }
-//
-//        if(frontSize + backSize == 0)
-//            return null;
-//
-//        averagedPose[0] /= (frontSize + backSize);
-//        averagedPose[1] /= (frontSize + backSize);
-//
-//        double heading = MathUtilities.addAngles(Math.toDegrees( Math.atan2(averagedPose[3],averagedPose[2]) ), 0.0);
-//        return new double[]{averagedPose[0], averagedPose[1], heading};
-//    }
+    /**
+     * Updates the Robot Vision, call in each loop
+     *
+     * @return the robot pose [x, y, theta] in inches and degrees
+     */
+    public double[] update() {
+        detections = processor.getDetections();
 
-    private double[] localize(int i, boolean isFrontCam) {
-        final double FRONT_CAM_FORWARD_DIST = 5.5; //TODO: change this
-        final double FRONT_CAM_HORIZONTAL_DIST = 3.125;
+        double[] poseSum = new double[4];
+
+        int size = detections.size();
+        if(size == 0)
+            return null;
+
+        for(int i = 0; i < size; i++) {
+            double[] currentPose = addWeights(localize(i));
+            poseSum[0] += currentPose[0];
+            poseSum[1] += currentPose[1];
+            poseSum[2] += currentPose[2];
+            poseSum[3] += currentPose[3];
+        }
+
+        //TODO: figure out how to get the weighted sum to the right number
+//        return new double[]{averagedPose[0], averagedPose[1],
+//                Math.toDegrees(Math.atan2(poseSum[3],poseSum[2]))};
+        return null;
+    }
+
+    private double[] localize(int i) {
+        final double FORWARD_DIST = 5.5;
+        final double HORIZONTAL_DIST = 3.0;
 
         AprilTagDetection aprilTagDetection = detections.get(i);
 
         int id = aprilTagDetection.id;
+        boolean isScoringTag = id <= 6;
+
         double range = aprilTagDetection.ftcPose.range;
         double yaw = aprilTagDetection.ftcPose.yaw;
         double bearing = aprilTagDetection.ftcPose.bearing;
-        boolean isScoringTag = id <= 6;
-
-        double tagX = isScoringTag ? -61.5 : 72.125;
-        double tagY = getTagYCoordinate(id);
-
-        double fieldHeading = isScoringTag ? AngleMath.addAngles(-yaw, -180.0) : -yaw;
 
         double cameraDeltaX = range * Math.cos(Math.toRadians(bearing - yaw));
         double cameraDeltaY = range * Math.sin(Math.toRadians(bearing - yaw));
 
-        double cameraX = isScoringTag ? tagX + cameraDeltaX : tagX - cameraDeltaX;
-        double cameraY = isScoringTag ? tagY + cameraDeltaY : tagY - cameraDeltaY; //TODO: is this right???
+        double cameraX = isScoringTag ? cameraDeltaX - 60.25 : 70.25 - cameraDeltaX;
+        double cameraY = isScoringTag ?
+                getTagYCoordinate(id) + cameraDeltaY : getTagYCoordinate(id) - cameraDeltaY;
 
-        double fieldHeadingInRadians = Math.toRadians(fieldHeading);
+        double fieldHeadingInRadians =
+                Math.toRadians(isScoringTag ? AngleMath.addAngles(-yaw, -180.0) : -yaw);
 
-        double localizedX = cameraX - FRONT_CAM_FORWARD_DIST * Math.cos(fieldHeadingInRadians)
-                - FRONT_CAM_HORIZONTAL_DIST * Math.sin(fieldHeadingInRadians);
-        double localizedY = cameraY - FRONT_CAM_HORIZONTAL_DIST * Math.cos(fieldHeadingInRadians)
-                - FRONT_CAM_FORWARD_DIST * Math.sin(fieldHeadingInRadians); //TODO: check this too
+        double localizedX = cameraX - HORIZONTAL_DIST * Math.sin(fieldHeadingInRadians)
+                - FORWARD_DIST * Math.cos(fieldHeadingInRadians);
 
-        //TODO: change this and averaging logic
-        return new double[] {localizedX, localizedY, fieldHeading, id == 7 || id == 10 ? 1.0 : 0.0};
+        double localizedY = cameraY - FORWARD_DIST * Math.sin(fieldHeadingInRadians)
+                + HORIZONTAL_DIST * Math.cos(fieldHeadingInRadians);
+
+        return new double[]{localizedX, localizedY, fieldHeadingInRadians, range, id};
     }
 
     private double getTagYCoordinate(int id) {
         switch(id) {
+            case 1:
+                return -41.41;
             case 2:
-            case 9:
-                return -36.0;
+                return -35.41;
             case 3:
-                return -30.0;
+                return -29.41;
             case 4:
-                return 30.0;
+                return 29.41;
             case 5:
-            case 8:
-                return 36.0;
+                return 35.41;
             case 6:
+                return 41.41;
             case 7:
-                return 42.0;
+                return 40.625;
+            case 8:
+                return 35.125;
+            case 9:
+                return -35.125;
             default:
-                return -42.0;
+                return -40.625;
         }
+    }
+
+    private double[] addWeights(double[] data) {
+        double weighting = (data[4] == 7.0 || data[4] == 10.0 ? 25.0 : 4.0) / (data[3] * data[3]);
+
+        return new double[]{
+                data[0] * weighting,
+                data[1] * weighting,
+                weighting * Math.cos(data[2]),
+                weighting * Math.sin(data[2])
+        };
     }
 
     /**
