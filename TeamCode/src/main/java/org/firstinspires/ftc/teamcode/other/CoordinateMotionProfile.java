@@ -14,12 +14,11 @@ public class CoordinateMotionProfile {
     private double previousX;
     private double previousY;
 
-
     /**
      * Instantiates the Profile with the default values
      */
     public CoordinateMotionProfile() {
-        this(0.0, 0.0, -1.0, 1.0, 3.0);
+        this(0.0, 0.0, -1.0, 1.0, 2.0);
     }
 
     /**

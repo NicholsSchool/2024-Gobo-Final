@@ -65,11 +65,6 @@ public class DrivetrainTeleop extends OpMode {
         telemetry.addData("turn", turn);
         telemetry.addData("autoAlign", autoAlign);
 
-        double[] velocities = drivetrain.getMotorVelocities();
-        telemetry.addData("left vel", velocities[0]);
-        telemetry.addData("right vel", velocities[1]);
-        telemetry.addData("back vel", velocities[2]);
-
         double[] odometry = drivetrain.getOdometryPositions();
         telemetry.addData("raw left pos", odometry[0]);
         telemetry.addData("raw right pos", odometry[1]);

@@ -1,12 +1,8 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-//TODO: localization smoothing using profile
-//TODO: camera exposure tuning
-//TODO: decide after all that if small april tags are worth it
-
-//TODO: experiment with loop() times with pause/not calling the method, etc
-//TODO: test loop time with MJPEG format
-//TODO: separate method for camera 2, test loop times
+//TODO: decide if small april tags are worth it
+//TODO: decide if back camera is worth it
+//TODO: verify that it works everywhere
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -16,6 +12,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.other.AngleMath;
+import org.firstinspires.ftc.teamcode.other.CoordinateMotionProfile;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
@@ -24,27 +21,32 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
  * The Vision Subsystem of the Robot
  */
 public class Vision {
-    AprilTagProcessor processor;
-    VisionPortal portal;
-    ArrayList<AprilTagDetection> detections;
+    private final AprilTagProcessor processor;
+    private ArrayList<AprilTagDetection> detections;
+    private final CoordinateMotionProfile smoothing;
+    private double weightsSum;
 
     /**
      * Instantiates the Vision Subsystem
      *
      * @param hwMap the hardware map
+     * @param initialX the starting X
+     * @param initialY the starting Y
      */
-    public Vision(HardwareMap hwMap) {
+    public Vision(HardwareMap hwMap, double initialX, double initialY) {
         processor = new AprilTagProcessor.Builder()
                 .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
                 .build();
 
-        portal = new VisionPortal.Builder()
+        VisionPortal portal = new VisionPortal.Builder()
                 .setCamera(hwMap.get(WebcamName.class, "Webcam 1"))
                 .setStreamFormat(VisionPortal.StreamFormat.YUY2)
                 .addProcessor(processor)
                 .build();
 
         detections = new ArrayList<>();
+
+        smoothing = new CoordinateMotionProfile(initialX, initialY, -72.0, 72.0, 60.0);
     }
 
     /**
@@ -54,6 +56,7 @@ public class Vision {
      */
     public double[] update() {
         detections = processor.getDetections();
+        weightsSum = 0;
 
         double[] poseSum = new double[4];
 
@@ -69,10 +72,10 @@ public class Vision {
             poseSum[3] += currentPose[3];
         }
 
-        //TODO: figure out how to get the weighted sum to the right number
-//        return new double[]{averagedPose[0], averagedPose[1],
-//                Math.toDegrees(Math.atan2(poseSum[3],poseSum[2]))};
-        return null;
+        double[] smoothedXY = smoothing.update(poseSum[0] / weightsSum, poseSum[1] / weightsSum);
+
+        return new double[]{smoothedXY[0], smoothedXY[1],
+                Math.toDegrees(Math.atan2(poseSum[3],poseSum[2]))};
     }
 
     private double[] localize(int i) {
@@ -134,10 +137,11 @@ public class Vision {
 
     private double[] addWeights(double[] data) {
         double weighting = (data[4] == 7.0 || data[4] == 10.0 ? 25.0 : 4.0) / (data[3] * data[3]);
+        weightsSum += weighting;
 
         return new double[]{
-                data[0] * weighting,
-                data[1] * weighting,
+                weighting * data[0],
+                weighting * data[1],
                 weighting * Math.cos(data[2]),
                 weighting * Math.sin(data[2])
         };

@@ -1,12 +1,12 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import com.qualcomm.hardware.bosch.BHI260IMU;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+
+import com.kauailabs.navx.ftc.AHRS;
+import com.qualcomm.hardware.kauailabs.NavxMicroNavigationSensor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.other.AngleMath;
 import org.firstinspires.ftc.teamcode.other.CoordinateMotionProfile;
 import org.firstinspires.ftc.teamcode.other.MotionProfile;
@@ -16,6 +16,7 @@ import org.firstinspires.ftc.teamcode.other.MotionProfile;
 //TODO: tune the motion profile constants
 //TODO: tune auto align and spline constants
 //TODO: edit scoring and intaking waypoints
+//TODO: change scoring path to go through the center truss
 
 /**
  * Robot Drivetrain Subsystem
@@ -38,7 +39,7 @@ public class Drivetrain {
 
     private final boolean isBlueAlliance;
     private final DcMotorEx leftDrive, rightDrive, backDrive, frontOdometry, leftOdometry, rightOdometry;
-    private final BHI260IMU imu;
+    private final AHRS navx;
     private final CoordinateMotionProfile driveProfile;
     private final MotionProfile turnProfile;
     private int previousLeftPosition, previousRightPosition, previousFrontPosition;
@@ -94,11 +95,8 @@ public class Drivetrain {
         rightOdometry.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         frontOdometry.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
 
-        imu = hwMap.get(BHI260IMU.class, "imu");
-        imu.initialize(new BHI260IMU.Parameters(new RevHubOrientationOnRobot(
-                        RevHubOrientationOnRobot.LogoFacingDirection.DOWN,
-                        RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD)));
-        imu.resetYaw();
+        navx = AHRS.getInstance(hwMap.get(NavxMicroNavigationSensor.class,
+                "navx"), AHRS.DeviceDataType.kProcessedData);
 
         driveProfile = new CoordinateMotionProfile();
         turnProfile = new MotionProfile();
@@ -282,7 +280,7 @@ public class Drivetrain {
         double deltaX = (deltaLeft + deltaRight) * INCHES_PER_TICK * STRAFE_ODOMETRY_CORRECTION;
         double deltaY = deltaFront * INCHES_PER_TICK * FORWARD_ODOMETRY_CORRECTION;
 
-        heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) + imuOffset;
+        heading = -navx.getYaw() + imuOffset;
 
         double adjustedHeadingRadians = Math.toRadians((heading + previousHeading) * 0.5);
 
@@ -304,7 +302,7 @@ public class Drivetrain {
     public void setPose(double[] pose) {
         x = pose[0];
         y = pose[1];
-        imuOffset = pose[2] - imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+        imuOffset = pose[2] + navx.getYaw();
     }
 
     /**
