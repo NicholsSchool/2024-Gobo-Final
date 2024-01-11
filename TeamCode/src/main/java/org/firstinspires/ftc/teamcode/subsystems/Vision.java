@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 //TODO: decide if small april tags are worth it
 //TODO: decide if back camera is worth it
+//TODO: decide if we should move the smoothing to the Drivetrain
 //TODO: verify that it works everywhere
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
