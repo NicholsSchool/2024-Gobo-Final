@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-
 import com.kauailabs.navx.ftc.AHRS;
 import com.qualcomm.hardware.kauailabs.NavxMicroNavigationSensor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -10,6 +9,8 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.teamcode.other.AngleMath;
 import org.firstinspires.ftc.teamcode.other.CoordinateMotionProfile;
 import org.firstinspires.ftc.teamcode.other.MotionProfile;
+
+//TODO: UPDATE ALL USES OF drive() FOR THE NEW X AND Y PARAMETERS
 
 //TODO: tune the odometry correction
 //TODO: tune the drive motors ff
@@ -34,8 +35,6 @@ public class Drivetrain {
     private final double SPLINE_ERROR = 2.0;
     private final double LEFT_WAYPOINT_X = -14.0;
     private final double RIGHT_WAYPOINT_X = 38.0;
-    private final double BLUE_WAYPOINT_Y = 36.0;
-    private final double RED_WAYPOINT_Y = -36.0;
 
     private final boolean isBlueAlliance;
     private final DcMotorEx leftDrive, rightDrive, backDrive, frontOdometry, leftOdometry, rightOdometry;
@@ -80,6 +79,9 @@ public class Drivetrain {
         leftDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         rightDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         backDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        leftOdometry.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        rightOdometry.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        frontOdometry.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
         leftDrive.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         rightDrive.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -125,22 +127,17 @@ public class Drivetrain {
     /**
      * Drives the robot field oriented
      *
-     * @param power the driving power proportion
-     * @param angle the angle to drive at in degrees
+     * @param xIn the x input value
+     * @param yIn the y input value
      * @param turn the turning power proportion
      * @param autoAlign whether to autoAlign
      */
-    public void drive(double power, double angle, double turn, boolean autoAlign) {
-        if(autoAlign)
-            turn = turnProfile.update(turnToAngle());
-        else
-            turn = turnProfile.update(Range.clip(turn, -0.25, 0.25));
+    public void drive(double xIn, double yIn, double turn, boolean autoAlign) {
+        turn = turnProfile.update(autoAlign ? turnToAngle() : Range.clip(turn, -0.25, 0.25));
 
-        power = Range.clip(power, 0.0, 1.0 - turn);
-        double angleRadians = Math.toRadians(angle);
-        double[] xy = driveProfile.update(power * Math.cos(angleRadians), power * Math.sin(angleRadians));
-        power = Math.hypot(xy[0], xy[1]);
-        angle = Math.toDegrees(Math.atan2(xy[1], xy[0]));
+        double[] xy = driveProfile.update(xIn, yIn);
+        double power = Range.clip(Math.hypot(xy[0], xy[1]), 0.0, 0.9 - turn);
+        double angle = Math.toDegrees(Math.atan2(xy[1], xy[0]));
 
         leftDrive.setVelocity((turn + power * Math.cos(Math.toRadians(angle + 30.0 - heading))) * MAX_MOTOR_VEL);
         rightDrive.setVelocity((turn + power * Math.cos(Math.toRadians(angle + 150.0 - heading))) * MAX_MOTOR_VEL);
@@ -228,6 +225,8 @@ public class Drivetrain {
         double power = distance >= SPLINE_ERROR ? SPLINE_P * distance : 0.0;
 
         double angle;
+        double BLUE_WAYPOINT_Y = 36.0;
+        double RED_WAYPOINT_Y = -36.0;
         if(x < LEFT_WAYPOINT_X)
             angle = angleToVertex(LEFT_WAYPOINT_X, isBlueAlliance ? BLUE_WAYPOINT_Y : RED_WAYPOINT_Y, true);
         else if(x < RIGHT_WAYPOINT_X)
@@ -243,16 +242,17 @@ public class Drivetrain {
      * area using parabolas in piecewise.
      */
     public void splineToScoring(double turn, boolean autoAlign, double scoringY) {
-        double SCORING_X = -42.0;
+        final double SCORING_X = -42.0;
+        final double WAYPOINT_Y = 0.0;
 
         double distance = Math.hypot(SCORING_X - x, scoringY - y);
         double power = distance >= SPLINE_ERROR ? SPLINE_P * distance : 0.0;
 
         double angle;
         if(x > RIGHT_WAYPOINT_X)
-            angle = angleToVertex(RIGHT_WAYPOINT_X, isBlueAlliance ? BLUE_WAYPOINT_Y : RED_WAYPOINT_Y, false);
+            angle = angleToVertex(RIGHT_WAYPOINT_X, WAYPOINT_Y, false);
         else if(x > LEFT_WAYPOINT_X)
-            angle = angleToVertex(LEFT_WAYPOINT_X, isBlueAlliance ? BLUE_WAYPOINT_Y : RED_WAYPOINT_Y, false);
+            angle = angleToVertex(LEFT_WAYPOINT_X, WAYPOINT_Y, false);
         else
             angle = angleFromVertex(SCORING_X, scoringY, LEFT_WAYPOINT_X, false);
 

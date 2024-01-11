@@ -1,11 +1,11 @@
 package org.firstinspires.ftc.teamcode.other;
 
 /**
- * Methods for doing math with Angles
+ * Angles are dumb. Insert methods to take care of those dumb cases
  */
 public class AngleMath {
     /**
-     * Adds angles and keeps the sum in the range [-180, 180)
+     * Adds angles and puts the sum in the range [-180, 180)
      *
      * @param angle1 the first angle
      * @param angle2 the second angle

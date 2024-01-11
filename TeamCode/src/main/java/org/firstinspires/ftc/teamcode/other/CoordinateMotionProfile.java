@@ -18,7 +18,7 @@ public class CoordinateMotionProfile {
      * Instantiates the Profile with the default values
      */
     public CoordinateMotionProfile() {
-        this(0.0, 0.0, -1.0, 1.0, 2.0);
+        this(0.0, 0.0, -1.0, 1.0, 2.5);
     }
 
     /**

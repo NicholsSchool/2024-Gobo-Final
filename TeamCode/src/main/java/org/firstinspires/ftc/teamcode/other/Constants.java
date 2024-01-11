@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.other;
 
 /**
- * Robot Constants that are used in multiple Classes
+ * Robot Constants that are used in Multiple Classes
  */
 public final class Constants {
     /** Denotes Red Alliance in Subsystem Constructors */

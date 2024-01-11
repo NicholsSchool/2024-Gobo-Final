@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.controller;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.util.Range;
 
 /**
  * The Controller containing Button and Axis objects
@@ -87,18 +86,5 @@ public class Controller {
         rightStickY.update(-gamepad.right_stick_y);
         leftTrigger.update(gamepad.left_trigger);
         rightTrigger.update(gamepad.right_trigger);
-    }
-
-    /**
-     * The Radius and Angle Values of the Left Joystick
-     *
-     * @return the r, theta transformation of the joystick
-     */
-    public double[] leftStick() {
-        double x = leftStickX.getValue();
-        double y = leftStickY.getValue();
-        return new double[]{
-                Range.clip(Math.hypot(x, y), 0.0, 1.0),
-                Math.toDegrees(Math.atan2(y, x))};
     }
 }
