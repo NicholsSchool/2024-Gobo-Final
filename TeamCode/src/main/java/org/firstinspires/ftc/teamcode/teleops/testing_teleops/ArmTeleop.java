@@ -9,8 +9,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.subsystems.Arm;
 
-//TODO: full check of all arm functionalities
-
 /**
  * Teleop for testing Arm functionalities
  */

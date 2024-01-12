@@ -11,8 +11,6 @@ import org.firstinspires.ftc.teamcode.other.MotionProfile;
 
 //TODO: test RUN_USING_ENCODER effect on loop time
 //TODO: tune the drive motors ff OR remove drive encoders
-//TODO: debug the driving profile change
-//TODO: debug the spline change
 //TODO: tune spline p
 //TODO: tune spline error
 //TODO: optimize spline waypoints

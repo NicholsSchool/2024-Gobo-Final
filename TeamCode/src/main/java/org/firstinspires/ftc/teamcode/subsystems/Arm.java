@@ -5,10 +5,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
-//TODO: tune arm go to position
-//TODO: tune arm governor
-//TODO: tune wrist governor
-
 /**
  * Robot Arm Subsystem
  */
@@ -60,7 +56,7 @@ public class Arm {
      * @param power the input motor power
      */
     public void shoulderManual(double power) {
-        power = Range.clip(power, -0.25, 0.25);
+        power = Range.clip(power, -0.3, 0.3);
         leftShoulder.setPower(power);
         rightShoulder.setPower(power);
     }
@@ -92,8 +88,8 @@ public class Arm {
      */
     public void armGoToPosition(double desiredPosition) {
         double position = getArmPosition();
-        shoulderManual(0.0005 * (desiredPosition - position) +
-                0.5 * Math.cos(Math.PI * position / (2850 * 2.0)));
+        shoulderManual(0.001 * (desiredPosition - position) +
+                0.05 * Math.cos(Math.PI * position / (2850 * 2.0)));
     }
 
     /**

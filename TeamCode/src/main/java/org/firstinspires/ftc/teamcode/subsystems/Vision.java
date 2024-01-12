@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-//TODO: debug the logic
 //TODO: decide if small april tags are worth it
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
