@@ -18,8 +18,8 @@ public class HandTeleop extends OpMode {
     private ElapsedTime loopTimer;
     private Hand hand;
     public static boolean sync;
-    public static boolean leftPos;
-    public static boolean rightPos;
+    public static boolean closeLeft;
+    public static boolean closeRight;
 
     /**
      * Code to run ONCE when the driver hits INIT
@@ -36,8 +36,8 @@ public class HandTeleop extends OpMode {
      */
     @Override
     public void loop() {
-        hand.leftGrabber(leftPos);
-        hand.rightGrabber(sync ? leftPos : rightPos);
+        hand.leftGrabber(closeLeft);
+        hand.rightGrabber(sync ? closeLeft : closeRight);
 
         telemetry.addData("loop time millis", loopTimer.time());
         loopTimer.reset();

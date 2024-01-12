@@ -21,6 +21,7 @@ public class ArmTeleop extends OpMode {
     private Arm arm;
     public static double shoulderPower;
     public static boolean armGoToPos;
+    public static boolean climb;
     public static int armDesiredPosition;
     public static double wristPower;
     public static boolean launchPlane;
@@ -41,7 +42,9 @@ public class ArmTeleop extends OpMode {
      */
     @Override
     public void loop() {
-        if(armGoToPos)
+        if(climb)
+            arm.climb(shoulderPower);
+        else if(armGoToPos)
             arm.armGoToPosition(armDesiredPosition);
         else
             arm.shoulderManual(shoulderPower);

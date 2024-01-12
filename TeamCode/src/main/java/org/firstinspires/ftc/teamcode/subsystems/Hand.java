@@ -26,18 +26,18 @@ public class Hand {
     /**
      * Controls the left grabber
      *
-     * @param isOpening whether to open or close
+     * @param isClosing whether to open or close
      */
-    public void leftGrabber(boolean isOpening) {
-        leftGrabber.setPosition(isOpening ? 0.0 : 1.0);
+    public void leftGrabber(boolean isClosing) {
+        leftGrabber.setPosition(isClosing ? 1.0 : 0.0);
     }
 
     /**
      * Controls the right grabber
      *
-     * @param isOpening whether to open or close
+     * @param isClosing whether to open or close
      */
-    public void rightGrabber(boolean isOpening) {
-        rightGrabber.setPosition(isOpening ? 1.0 : 0.0);
+    public void rightGrabber(boolean isClosing) {
+        rightGrabber.setPosition(isClosing ? 0.0 : 1.0);
     }
 }

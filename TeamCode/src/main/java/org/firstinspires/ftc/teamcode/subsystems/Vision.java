@@ -1,9 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+//TODO: debug the logic
 //TODO: decide if small april tags are worth it
-//TODO: decide if back camera is worth it
-//TODO: decide if we should move the smoothing to the Drivetrain
-//TODO: verify that it works everywhere
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -12,7 +10,6 @@ import java.util.ArrayList;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.other.AngleMath;
 import org.firstinspires.ftc.teamcode.other.CoordinateMotionProfile;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
@@ -26,6 +23,7 @@ public class Vision {
     private ArrayList<AprilTagDetection> detections;
     private final CoordinateMotionProfile smoothing;
     private double weightsSum;
+    private int size;
 
     /**
      * Instantiates the Vision Subsystem
@@ -61,7 +59,7 @@ public class Vision {
 
         double[] poseSum = new double[4];
 
-        int size = detections.size();
+        size = detections.size();
         if(size == 0)
             return null;
 
@@ -74,9 +72,7 @@ public class Vision {
         }
 
         double[] smoothedXY = smoothing.update(poseSum[0] / weightsSum, poseSum[1] / weightsSum);
-
-        return new double[]{smoothedXY[0], smoothedXY[1],
-                Math.toDegrees(Math.atan2(poseSum[3],poseSum[2]))};
+        return new double[]{smoothedXY[0], smoothedXY[1], Math.toDegrees(Math.atan2(poseSum[3],poseSum[2]))};
     }
 
     private double[] localize(int i) {
@@ -96,11 +92,11 @@ public class Vision {
         double cameraDeltaY = range * Math.sin(Math.toRadians(bearing - yaw));
 
         double cameraX = isScoringTag ? cameraDeltaX - 60.25 : 70.25 - cameraDeltaX;
-        double cameraY = isScoringTag ?
-                getTagYCoordinate(id) + cameraDeltaY : getTagYCoordinate(id) - cameraDeltaY;
+        double cameraY =
+                isScoringTag ? getTagYCoordinate(id) + cameraDeltaY : getTagYCoordinate(id) - cameraDeltaY;
 
         double fieldHeadingInRadians =
-                Math.toRadians(isScoringTag ? AngleMath.addAngles(-yaw, -180.0) : -yaw);
+                Math.toRadians(isScoringTag ? -yaw - 180.0 : -yaw);
 
         double localizedX = cameraX - HORIZONTAL_DIST * Math.sin(fieldHeadingInRadians)
                 - FORWARD_DIST * Math.cos(fieldHeadingInRadians);
@@ -154,6 +150,6 @@ public class Vision {
      * @return the number of detections
      */
     public int getNumDetections() {
-        return detections.size();
+        return size;
     }
 }

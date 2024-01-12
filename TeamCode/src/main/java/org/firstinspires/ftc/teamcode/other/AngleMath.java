@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.other;
 
 /**
- * Angles are dumb. Insert methods to take care of those dumb cases
+ * Methods to handle special cases with angles
  */
 public class AngleMath {
     /**

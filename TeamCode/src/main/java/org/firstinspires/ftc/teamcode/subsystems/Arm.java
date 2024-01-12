@@ -5,7 +5,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
-//TODO: tune arm go to position and governor
+//TODO: tune arm go to position
+//TODO: tune arm governor
 //TODO: tune wrist governor
 
 /**
@@ -59,17 +60,20 @@ public class Arm {
      * @param power the input motor power
      */
     public void shoulderManual(double power) {
-        power = Range.clip(power, -0.5, 0.5);
+        power = Range.clip(power, -0.25, 0.25);
         leftShoulder.setPower(power);
         rightShoulder.setPower(power);
     }
 
     /**
-     * Climbs at Max Shoulder Power
+     * Shoulder Input for climbing.
+     * THERE IS NO SPEED GOVERNOR ON THIS METHOD
+     *
+     * @param power the input motor power
      */
-    public void climb() {
-        leftShoulder.setPower(1.0);
-        rightShoulder.setPower(1.0);
+    public void climb(double power) {
+        leftShoulder.setPower(power);
+        rightShoulder.setPower(power);
     }
 
     /**
@@ -88,11 +92,8 @@ public class Arm {
      */
     public void armGoToPosition(double desiredPosition) {
         double position = getArmPosition();
-
-        double power = 0.0005 * (desiredPosition - position);
-        double scalingFactor = 0.000022 * (2850 - position);
-
-        shoulderManual(power + scalingFactor);
+        shoulderManual(0.0005 * (desiredPosition - position) +
+                0.5 * Math.cos(Math.PI * position / (2850 * 2.0)));
     }
 
     /**

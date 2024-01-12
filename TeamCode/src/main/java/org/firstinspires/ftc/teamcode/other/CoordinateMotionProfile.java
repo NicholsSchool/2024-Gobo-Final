@@ -71,4 +71,44 @@ public class CoordinateMotionProfile {
 
         return result;
     }
+
+    /**
+     * Updates the Profile and returns the next value.
+     * Call in each loop()
+     *
+     * @param newX the new X value
+     * @param newY the new Y value
+     * @param tempMaxDist the temporary Maximum distance between the output x and y and (0, 0)
+     *
+     * @return the smoothed new coordinates
+     */
+    public double[] update(double newX, double newY, double tempMaxDist) {
+        double time = timer.time();
+        timer.reset();
+
+        double change = Math.hypot(newX - previousX, newY - previousY);
+
+        double[] result;
+        if(change <= maxSpeed * time)
+            result = new double[]{
+                    Range.clip(newX, minValue, maxValue),
+                    Range.clip(newY, minValue, maxValue)};
+        else
+            result = new double[]{
+                    Range.clip(previousX + maxSpeed * time * (newX - previousX) / change,
+                            minValue, maxValue),
+                    Range.clip(previousY + maxSpeed * time * (newY - previousY) / change,
+                            minValue, maxValue)};
+
+        double distance = Math.hypot(result[0], result[1]);
+        if(distance > tempMaxDist) {
+            result[0] *= tempMaxDist / distance;
+            result[1] *= tempMaxDist / distance;
+        }
+
+        previousX = result[0];
+        previousY = result[1];
+
+        return result;
+    }
 }

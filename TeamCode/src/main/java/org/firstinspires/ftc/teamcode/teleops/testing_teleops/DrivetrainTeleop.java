@@ -44,6 +44,7 @@ public class DrivetrainTeleop extends OpMode {
         drivetrain.update();
 
         boolean autoAlign = driverController.rightStickX.zeroLongEnough();
+        boolean lowGear = driverController.leftTrigger.getValue() >= 0.5;
 
         if(!autoAlign)
             drivetrain.setDesiredHeading(drivetrain.getFieldHeading());
@@ -56,24 +57,14 @@ public class DrivetrainTeleop extends OpMode {
         else if(driverController.x.wasJustPressed())
             drivetrain.setDesiredHeading(-180.0);
 
-        double[] powerAngle = driverController.leftStick();
+        double x = driverController.leftStickX.getValue();
+        double y = driverController.leftStickY.getValue();
         double turn = driverController.rightStickX.getValue();
-        drivetrain.drive(powerAngle[0], powerAngle[1], turn, autoAlign);
-
-        telemetry.addData("power", powerAngle[0]);
-        telemetry.addData("angle", powerAngle[1]);
-        telemetry.addData("turn", turn);
-        telemetry.addData("autoAlign", autoAlign);
-
-        double[] odometry = drivetrain.getOdometryPositions();
-        telemetry.addData("raw left pos", odometry[0]);
-        telemetry.addData("raw right pos", odometry[1]);
-        telemetry.addData("raw front pos", odometry[2]);
+        drivetrain.drive(x, y, turn, autoAlign, lowGear);
 
         double[] xy = drivetrain.getXY();
-        telemetry.addData("x", xy[0]);
-        telemetry.addData("y", xy[1]);
-
+        telemetry.addData("robot x", xy[0]);
+        telemetry.addData("robot y", xy[1]);
         telemetry.addData("theta", drivetrain.getFieldHeading());
 
         telemetry.addData("loop time millis", loopTimer.time());
