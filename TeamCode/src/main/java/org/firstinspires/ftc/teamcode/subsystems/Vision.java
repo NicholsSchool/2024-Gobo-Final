@@ -13,6 +13,8 @@ import org.firstinspires.ftc.teamcode.other.CoordinateMotionProfile;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import org.firstinspires.ftc.teamcode.other.Constants.ProfileConstants;
+import org.firstinspires.ftc.teamcode.other.Constants.VisionConstants;
 
 /**
  * The Vision Subsystem of the Robot
@@ -44,7 +46,8 @@ public class Vision {
 
         detections = new ArrayList<>();
 
-        smoothing = new CoordinateMotionProfile(initialX, initialY, -72.0, 72.0, 60.0);
+        smoothing = new CoordinateMotionProfile(initialX, initialY,
+                -ProfileConstants.FIELD_MAX, ProfileConstants.FIELD_MAX, ProfileConstants.FIELD_MAX_SPEED);
     }
 
     /**
@@ -75,9 +78,6 @@ public class Vision {
     }
 
     private double[] localize(int i) {
-        final double FORWARD_DIST = 5.5;
-        final double HORIZONTAL_DIST = 3.0;
-
         AprilTagDetection aprilTagDetection = detections.get(i);
 
         int id = aprilTagDetection.id;
@@ -97,11 +97,11 @@ public class Vision {
         double fieldHeadingInRadians =
                 Math.toRadians(isScoringTag ? -yaw - 180.0 : -yaw);
 
-        double localizedX = cameraX - HORIZONTAL_DIST * Math.sin(fieldHeadingInRadians)
-                - FORWARD_DIST * Math.cos(fieldHeadingInRadians);
+        double localizedX = cameraX - VisionConstants.HORIZONTAL_DIST * Math.sin(fieldHeadingInRadians)
+                - VisionConstants.FORWARD_DIST * Math.cos(fieldHeadingInRadians);
 
-        double localizedY = cameraY - FORWARD_DIST * Math.sin(fieldHeadingInRadians)
-                + HORIZONTAL_DIST * Math.cos(fieldHeadingInRadians);
+        double localizedY = cameraY - VisionConstants.FORWARD_DIST * Math.sin(fieldHeadingInRadians)
+                + VisionConstants.HORIZONTAL_DIST * Math.cos(fieldHeadingInRadians);
 
         return new double[]{localizedX, localizedY, fieldHeadingInRadians, range, id};
     }
@@ -132,7 +132,8 @@ public class Vision {
     }
 
     private double[] addWeights(double[] data) {
-        double weighting = (data[4] == 7.0 || data[4] == 10.0 ? 25.0 : 4.0) / (data[3] * data[3]);
+        double weighting = (data[4] == 7.0 || data[4] == 10.0 ?
+                VisionConstants.BIG_TAG : VisionConstants.SMALL_TAG) / (data[3] * data[3]);
         weightsSum += weighting;
 
         return new double[]{

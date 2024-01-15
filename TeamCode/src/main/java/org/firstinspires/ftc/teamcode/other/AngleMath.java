@@ -1,14 +1,14 @@
 package org.firstinspires.ftc.teamcode.other;
 
 /**
- * Methods to handle special cases with angles
+ * Methods for doing math with Angles
  */
 public class AngleMath {
     /**
-     * Adds angles and puts the sum in the range [-180, 180)
+     * Adds angles and sets the sum to the range [-180, 180)
      *
-     * @param angle1 the first angle
-     * @param angle2 the second angle
+     * @param angle1 the first angle in degrees
+     * @param angle2 the second angle in degrees
      * @return the sum in degrees
      */
     public static double addAngles(double angle1, double angle2) {

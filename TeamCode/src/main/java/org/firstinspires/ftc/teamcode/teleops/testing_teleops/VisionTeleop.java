@@ -10,8 +10,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
 
-//TODO: test all Vision Functionalities
-
 /**
  * A teleop to copy paste edit with
  */

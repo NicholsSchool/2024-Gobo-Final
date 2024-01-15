@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.other;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.teamcode.other.Constants.ProfileConstants;
+
 /**
  * A Motion Profile for a Point on a Coordinate Plane
  */
@@ -18,7 +20,8 @@ public class CoordinateMotionProfile {
      * Instantiates the Profile with the default values
      */
     public CoordinateMotionProfile() {
-        this(0.0, 0.0, -1.0, 1.0, 2.5);
+        this(0.0, 0.0, -ProfileConstants.COORDINATE_MAX,
+                ProfileConstants.COORDINATE_MAX, ProfileConstants.COORDINATE_MAX_SPEED);
     }
 
     /**
@@ -53,17 +56,18 @@ public class CoordinateMotionProfile {
         timer.reset();
 
         double change = Math.hypot(newX - previousX, newY - previousY);
+        double maxChange = maxSpeed * time;
 
         double[] result;
-        if(change <= maxSpeed * time)
+        if(change <= maxChange)
             result = new double[]{
                     Range.clip(newX, minValue, maxValue),
                     Range.clip(newY, minValue, maxValue)};
         else
             result = new double[]{
-                    Range.clip(previousX + maxSpeed * time * (newX - previousX) / change,
+                    Range.clip(previousX + maxChange * (newX - previousX) / change,
                             minValue, maxValue),
-                    Range.clip(previousY + maxSpeed * time * (newY - previousY) / change,
+                    Range.clip(previousY + maxChange * (newY - previousY) / change,
                             minValue, maxValue)};
 
         previousX = result[0];
@@ -83,22 +87,7 @@ public class CoordinateMotionProfile {
      * @return the smoothed new coordinates
      */
     public double[] update(double newX, double newY, double tempMaxDist) {
-        double time = timer.time();
-        timer.reset();
-
-        double change = Math.hypot(newX - previousX, newY - previousY);
-
-        double[] result;
-        if(change <= maxSpeed * time)
-            result = new double[]{
-                    Range.clip(newX, minValue, maxValue),
-                    Range.clip(newY, minValue, maxValue)};
-        else
-            result = new double[]{
-                    Range.clip(previousX + maxSpeed * time * (newX - previousX) / change,
-                            minValue, maxValue),
-                    Range.clip(previousY + maxSpeed * time * (newY - previousY) / change,
-                            minValue, maxValue)};
+        double[] result = update(newX, newY);
 
         double distance = Math.hypot(result[0], result[1]);
         if(distance > tempMaxDist) {

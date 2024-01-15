@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.teamcode.other.AngleMath;
 import org.firstinspires.ftc.teamcode.other.CoordinateMotionProfile;
 import org.firstinspires.ftc.teamcode.other.MotionProfile;
+import org.firstinspires.ftc.teamcode.other.Constants.DriveConstants;
 
 //TODO: test RUN_USING_ENCODER effect on loop time
 //TODO: tune the drive motors ff OR remove drive encoders
@@ -21,30 +22,6 @@ import org.firstinspires.ftc.teamcode.other.MotionProfile;
  * Robot Drivetrain Subsystem
  */
 public class Drivetrain {
-    /** The Closest to Driver Scoring Y For Blue Alliance */
-    public static final double BLUE_SCORING_Y_CLOSE = -42.0;
-
-    /** The Middle Distance to Driver Scoring Y For Blue Alliance */
-    public static final double BLUE_SCORING_Y_MID = -36.0;
-
-    /** The Farthest to Driver Scoring Y For Blue Alliance */
-    public static final double BLUE_SCORING_Y_FAR = -30.0;
-
-    /** The Farthest to Driver Scoring Y For Red Alliance */
-    public static final double RED_SCORING_Y_FAR = 30.0;
-
-    /** The Middle Distance to Driver Scoring Y For Red Alliance */
-    public static final double RED_SCORING_Y_MID = 36.0;
-
-    /** The Closest to Driver Scoring Y For Red Alliance */
-    public static final double RED_SCORING_Y_CLOSE = 42.0;
-
-    private final int MAX_MOTOR_VEL = 2800;
-    private final double SPLINE_P = 0.025;
-    private final double SPLINE_ERROR = 2.0;
-    private final double LEFT_WAYPOINT_X = -14.0;
-    private final double RIGHT_WAYPOINT_X = 38.0;
-
     private final boolean isBlueAlliance;
     private final DcMotorEx leftDrive, rightDrive, backDrive, frontOdometry, leftOdometry, rightOdometry;
     private final AHRS navx;
@@ -136,23 +113,22 @@ public class Drivetrain {
     public void drive(double xIn, double yIn, double turn, boolean autoAlign, boolean lowGear) {
         turn = turnProfile.update(autoAlign ? turnToAngle() : turn);
 
-        double[] xy = driveProfile.update(xIn, yIn, (lowGear ? 0.45 : 0.9) - turn);
+        double[] xy = driveProfile.update(xIn, yIn,
+                (lowGear ? DriveConstants.LOW_GEAR : DriveConstants.HIGH_GEAR) - Math.abs(turn));
         double power = Math.hypot(xy[0], xy[1]);
         double angle = Math.toDegrees(Math.atan2(xy[1], xy[0]));
 
-        leftDrive.setPower(turn + power * Math.cos(Math.toRadians(angle + 30.0 - heading)));
-        rightDrive.setPower(turn + power * Math.cos(Math.toRadians(angle + 150.0 - heading)));
-        backDrive.setPower(turn + power * Math.cos(Math.toRadians(angle + 270.0 - heading)));
+        leftDrive.setPower(turn +
+                power * Math.cos(Math.toRadians(angle + DriveConstants.LEFT_DRIVE_OFFSET - heading)));
+        rightDrive.setPower(turn +
+                power * Math.cos(Math.toRadians(angle + DriveConstants.RIGHT_DRIVE_OFFSET - heading)));
+        backDrive.setPower(turn +
+                power * Math.cos(Math.toRadians(angle + DriveConstants.BACK_DRIVE_OFFSET - heading)));
     }
 
-    /**
-     * Aligns the robot to the desired heading by spinning anchor-less
-     *
-     * @return the turning speed as a proportion
-     */
-    public double turnToAngle() {
+    private double turnToAngle() {
         double error = AngleMath.addAngles(heading, -desiredHeading);
-        return Math.abs(error) < 0.5 ? 0.0 : error * 0.005;
+        return Math.abs(error) < DriveConstants.AUTO_ALIGN_ERROR ? 0.0 : error * DriveConstants.AUTO_ALIGN_P;
     }
 
     /**
@@ -164,39 +140,13 @@ public class Drivetrain {
         this.desiredHeading = desiredHeading;
     }
 
-    /**
-     * With the robot at (x, y), calculates the drive angle of the robot
-     * in order to follow a parabola and arrive at the waypoint (wx, wy)
-     * that is the parabola's vertex.
-     * The parabola is defined to contain the robot's coordinates.
-     *
-     * @param wx the waypoint x coordinate
-     * @param wy the waypoint y coordinate
-     * @param toIntake whether the robot is going to the intake
-     *
-     * @return the x and y components of the drive vector
-     */
-    public double[] vectorToVertex(double wx, double wy, boolean toIntake) {
+    private double[] vectorToVertex(double wx, double wy, boolean toIntake) {
         if(x == wx)
             return toIntake ? new double[]{1.0, 0.0} : new double[]{-1.0, 0.0};
         return new double[]{wx - x, 2.0 * (wy - y)};
     }
 
-    /**
-     * With the robot at (x, y), calculates the drive angle of the robot
-     * in order to follow a parabola and arrive at the waypoint (wx, wy).
-     * The parabola is defined with its vertex constrained to the x-value
-     * of h (the previous waypoint), and the curve consists of both the
-     * waypoint and robot coordinates.
-     *
-     * @param wx the waypoint x coordinate
-     * @param wy the waypoint y coordinate
-     * @param h  the x value of the previous waypoint
-     * @param toIntake whether the robot is going to the intake
-     *
-     * @return the x and y components of the drive vector
-     */
-    public double[] vectorFromVertex(double wx, double wy, double h, boolean toIntake) {
+    private double[] vectorFromVertex(double wx, double wy, double h, boolean toIntake) {
         if(x == wx)
             return toIntake ? new double[]{1.0, 0.0} : new double[]{-1.0, 0.0};
 
@@ -219,22 +169,21 @@ public class Drivetrain {
      * @param lowGear whether to drive in low gear
      */
     public void splineToIntake(double turn, boolean autoAlign, boolean lowGear) {
-        double INTAKE_X = 56.0;
-        double BLUE_INTAKE_Y = 56.0;
-        double RED_INTAKE_Y = -56.0;
-        double BLUE_WAYPOINT_Y = 36.0;
-        double RED_WAYPOINT_Y = -36.0;
-
         double[] xy;
-        if(x < LEFT_WAYPOINT_X)
-            xy = vectorToVertex(LEFT_WAYPOINT_X, isBlueAlliance ? BLUE_WAYPOINT_Y : RED_WAYPOINT_Y, true);
-        else if(x < RIGHT_WAYPOINT_X)
-            xy = vectorToVertex(RIGHT_WAYPOINT_X, isBlueAlliance ? BLUE_WAYPOINT_Y : RED_WAYPOINT_Y, true);
+        if(x < DriveConstants.LEFT_WAYPOINT_X)
+            xy = vectorToVertex(DriveConstants.LEFT_WAYPOINT_X, isBlueAlliance ?
+                    DriveConstants.BLUE_WAYPOINT_Y : DriveConstants.RED_WAYPOINT_Y, true);
+        else if(x < DriveConstants.RIGHT_WAYPOINT_X)
+            xy = vectorToVertex(DriveConstants.RIGHT_WAYPOINT_X, isBlueAlliance ?
+                    DriveConstants.BLUE_WAYPOINT_Y : DriveConstants.RED_WAYPOINT_Y, true);
         else
-            xy = vectorFromVertex(INTAKE_X, isBlueAlliance ? BLUE_INTAKE_Y : RED_INTAKE_Y, RIGHT_WAYPOINT_X, true);
+            xy = vectorFromVertex(DriveConstants.INTAKE_X, isBlueAlliance ?
+                    DriveConstants.BLUE_INTAKE_Y : DriveConstants.RED_INTAKE_Y,
+                    DriveConstants.RIGHT_WAYPOINT_X, true);
 
-        double distance = Math.hypot(INTAKE_X - x, (isBlueAlliance ? BLUE_INTAKE_Y : RED_INTAKE_Y) - y);
-        double power = distance >= SPLINE_ERROR ? SPLINE_P * distance : 0.0;
+        double distance = Math.hypot(DriveConstants.INTAKE_X - x,
+                (isBlueAlliance ? DriveConstants.BLUE_INTAKE_Y : DriveConstants.RED_INTAKE_Y) - y);
+        double power = distance >= DriveConstants.SPLINE_ERROR ? DriveConstants.SPLINE_P * distance : 0.0;
         double hypotenuse = Math.hypot(xy[0], xy[1]);
         drive(xy[0] * power / hypotenuse, xy[1] * power / hypotenuse, turn, autoAlign, lowGear);
     }
@@ -249,19 +198,16 @@ public class Drivetrain {
      * @param lowGear whether to drive in low gear
      */
     public void splineToScoring(double turn, boolean autoAlign, double scoringY, boolean lowGear) {
-        final double SCORING_X = -42.0;
-        final double WAYPOINT_Y = 0.0;
-
         double[] xy;
-        if(x > RIGHT_WAYPOINT_X)
-            xy = vectorToVertex(RIGHT_WAYPOINT_X, WAYPOINT_Y, false);
-        else if(x > LEFT_WAYPOINT_X)
-            xy = vectorToVertex(LEFT_WAYPOINT_X, WAYPOINT_Y, false);
+        if(x > DriveConstants.RIGHT_WAYPOINT_X)
+            xy = vectorToVertex(DriveConstants.RIGHT_WAYPOINT_X, DriveConstants.WAYPOINT_Y_TO_SCORING, false);
+        else if(x > DriveConstants.LEFT_WAYPOINT_X)
+            xy = vectorToVertex(DriveConstants.LEFT_WAYPOINT_X, DriveConstants.WAYPOINT_Y_TO_SCORING, false);
         else
-            xy = vectorFromVertex(SCORING_X, scoringY, LEFT_WAYPOINT_X, false);
+            xy = vectorFromVertex(DriveConstants.SCORING_X, scoringY, DriveConstants.LEFT_WAYPOINT_X, false);
 
-        double distance = Math.hypot(SCORING_X - x, scoringY - y);
-        double power = distance >= SPLINE_ERROR ? SPLINE_P * distance : 0.0;
+        double distance = Math.hypot(DriveConstants.SCORING_X - x, scoringY - y);
+        double power = distance >= DriveConstants.SPLINE_ERROR ? DriveConstants.SPLINE_P * distance : 0.0;
         double hypotenuse = Math.hypot(xy[0], xy[1]);
         drive(xy[0] * power / hypotenuse, xy[1] * power / hypotenuse, turn, autoAlign, lowGear);
     }
@@ -270,20 +216,14 @@ public class Drivetrain {
      * Updates Pose using Odometry Wheels
      */
     public void update() {
-        final int TICKS_PER_REV = 8192;
-        final double DEAD_WHEEL_DIAMETER = 2.5;
-        final double INCHES_PER_TICK = DEAD_WHEEL_DIAMETER * Math.PI / TICKS_PER_REV;
-        final double STRAFE_ODOMETRY_CORRECTION = 1.0;
-        final double FORWARD_ODOMETRY_CORRECTION = 1.0;
-
         int currentLeft = leftOdometry.getCurrentPosition();
         int currentRight = rightOdometry.getCurrentPosition();
         int currentFront = frontOdometry.getCurrentPosition();
 
         double deltaX = (currentLeft - previousLeftPosition + currentRight - previousRightPosition) *
-                INCHES_PER_TICK * STRAFE_ODOMETRY_CORRECTION;
+                DriveConstants.INCHES_PER_TICK * DriveConstants.STRAFE_ODOMETRY_CORRECTION;
         double deltaY = currentFront - previousFrontPosition *
-                INCHES_PER_TICK * FORWARD_ODOMETRY_CORRECTION;
+                DriveConstants.INCHES_PER_TICK * DriveConstants.FORWARD_ODOMETRY_CORRECTION;
 
         heading = imuOffset - navx.getYaw();
 

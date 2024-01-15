@@ -11,8 +11,6 @@ import org.firstinspires.ftc.teamcode.controller.Controller;
 import org.firstinspires.ftc.teamcode.other.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 
-//TODO: Test full drivetrain functionalities
-
 /**
  * A teleop to copy paste edit with
  */
@@ -45,6 +43,9 @@ public class DrivetrainTeleop extends OpMode {
 
         boolean autoAlign = driverController.rightStickX.zeroLongEnough();
         boolean lowGear = driverController.leftTrigger.getValue() >= 0.5;
+
+        if(driverController.start.wasJustPressed())
+            drivetrain.disableDriveEncoders();
 
         if(!autoAlign)
             drivetrain.setDesiredHeading(drivetrain.getFieldHeading());

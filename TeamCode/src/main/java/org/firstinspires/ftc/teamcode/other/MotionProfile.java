@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.other;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.teamcode.other.Constants.ProfileConstants;
+
 /**
  * A simple Motion Profiler for smoothing changes to a value
  */
@@ -18,7 +20,8 @@ public class MotionProfile {
      * Instantiates the Profile with the default values
      */
     public MotionProfile() {
-        this(0.0, -0.25, 0.25, 1.0);
+        this(0.0, -ProfileConstants.MAX,
+                ProfileConstants.MAX, ProfileConstants.MAX_SPEED);
     }
 
     /**
@@ -50,8 +53,8 @@ public class MotionProfile {
         timer.reset();
 
         double change = newValue - previousValue;
-
         double maxChange = maxSpeed * time;
+
         double result;
         if(change > maxChange)
              result = Range.clip(previousValue + maxChange, minValue, maxValue);

@@ -5,6 +5,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.teamcode.other.Constants.ArmConstants;
+
 /**
  * Robot Arm Subsystem
  */
@@ -38,7 +40,7 @@ public class Arm {
 
         planeLauncher = hardwareMap.get(Servo.class, "planeLauncher");
         planeLauncher.setDirection(Servo.Direction.FORWARD);
-        planeLauncher.scaleRange(0.35, 1.0);
+        planeLauncher.scaleRange(ArmConstants.PLANE_MIN, ArmConstants.PLANE_MAX);
     }
 
     /**
@@ -56,7 +58,7 @@ public class Arm {
      * @param power the input motor power
      */
     public void shoulderManual(double power) {
-        power = Range.clip(power, -0.3, 0.3);
+        power = Range.clip(power, -ArmConstants.SHOULDER_MAX, ArmConstants.SHOULDER_MAX);
         leftShoulder.setPower(power);
         rightShoulder.setPower(power);
     }
@@ -88,8 +90,8 @@ public class Arm {
      */
     public void armGoToPosition(double desiredPosition) {
         double position = getArmPosition();
-        shoulderManual(0.001 * (desiredPosition - position) +
-                0.05 * Math.cos(Math.PI * position / (2850 * 2.0)));
+        shoulderManual(ArmConstants.SHOULDER_P * (desiredPosition - position) +
+                ArmConstants.SHOULDER_F * Math.cos(Math.PI * position / (ArmConstants.ARM_VERTICAL * 2.0)));
     }
 
     /**
@@ -98,6 +100,6 @@ public class Arm {
      * @param power the input motor power
      */
     public void wristManual(double power) {
-        wrist.setPower(Range.clip(power, -0.5, 0.5));
+        wrist.setPower(Range.clip(power, -ArmConstants.WRIST_MAX, ArmConstants.WRIST_MAX));
     }
 }

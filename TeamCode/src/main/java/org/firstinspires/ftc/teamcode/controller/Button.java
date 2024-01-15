@@ -27,7 +27,7 @@ public class Button {
     public void update(boolean isNowPressed) {
         wasPressed = isPressed;
         isPressed = isNowPressed;
-        toggleState = (isPressed && !wasPressed) != toggleState;
+        toggleState = wasJustPressed() != toggleState;
     }
 
     /**

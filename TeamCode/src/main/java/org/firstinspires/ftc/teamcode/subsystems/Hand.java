@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.other.Constants.HandConstants;
+
 /**
  * Robot Hand Subsystem
  */
@@ -16,11 +18,11 @@ public class Hand {
     public Hand(HardwareMap hardwareMap) {
         leftGrabber = hardwareMap.get(Servo.class, "leftGrabber");
         leftGrabber.setDirection(Servo.Direction.FORWARD);
-        leftGrabber.scaleRange(0.65, 0.825);
+        leftGrabber.scaleRange(HandConstants.LEFT_IN, HandConstants.LEFT_OUT);
 
         rightGrabber = hardwareMap.get(Servo.class, "rightGrabber");
         rightGrabber.setDirection(Servo.Direction.FORWARD);
-        rightGrabber.scaleRange(0.175, 0.35);
+        rightGrabber.scaleRange(HandConstants.RIGHT_OUT, HandConstants.RIGHT_IN);
     }
 
     /**

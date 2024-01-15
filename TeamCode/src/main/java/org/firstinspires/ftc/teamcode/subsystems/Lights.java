@@ -38,24 +38,6 @@ public class Lights {
     }
 
     /**
-     * Sets left LED strip to a certain color pattern
-     *
-     * @param pattern The BlinkinPattern to set the LED to
-     */
-    public void setLeftPattern(BlinkinPattern pattern) {
-        leftBlinkin.setPattern(pattern);
-    }
-
-    /**
-     * Sets right LED strip to a certain color pattern
-     *
-     * @param pattern The BlinkinPattern to set the LED to
-     */
-    public void setRightPattern(BlinkinPattern pattern) {
-        rightBlinkin.setPattern(pattern);
-    }
-
-    /**
      * Sets the default color based on alliance
      */
     public void setDefaultPattern() {
