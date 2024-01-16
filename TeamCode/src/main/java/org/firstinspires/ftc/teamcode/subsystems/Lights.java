@@ -6,7 +6,7 @@ import com.qualcomm.hardware.rev.RevBlinkinLedDriver.BlinkinPattern;
 
 /**
  * Robot Indicator Lights Subsystem
- * A full list of REV blink codes can be found
+ * A full list of REV Blinkin patterns can be found
  * <a href="https://first-tech-challenge.github.io/SkyStone/com/qualcomm/hardware/rev/RevBlinkinLedDriver.BlinkinPattern.html">here</a>.
  */
 public class Lights {

@@ -5,12 +5,12 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.teamcode.other.Constants.ArmConstants;
+import org.firstinspires.ftc.teamcode.constants.ArmConstants;
 
 /**
  * Robot Arm Subsystem
  */
-public class Arm {
+public class Arm implements ArmConstants {
     private final DcMotorEx leftShoulder;
     private final DcMotorEx rightShoulder;
     private final DcMotorEx wrist;
@@ -58,14 +58,13 @@ public class Arm {
      * @param power the input motor power
      */
     public void shoulderManual(double power) {
-        power = Range.clip(power, -ArmConstants.SHOULDER_MAX, ArmConstants.SHOULDER_MAX);
+        power = Range.clip(power, -SHOULDER_MAX, SHOULDER_MAX);
         leftShoulder.setPower(power);
         rightShoulder.setPower(power);
     }
 
     /**
-     * Shoulder Input for climbing.
-     * THERE IS NO SPEED GOVERNOR ON THIS METHOD
+     * Shoulder input for climbing with no power governor
      *
      * @param power the input motor power
      */
@@ -90,8 +89,8 @@ public class Arm {
      */
     public void armGoToPosition(double desiredPosition) {
         double position = getArmPosition();
-        shoulderManual(ArmConstants.SHOULDER_P * (desiredPosition - position) +
-                ArmConstants.SHOULDER_F * Math.cos(Math.PI * position / (ArmConstants.ARM_VERTICAL * 2.0)));
+        shoulderManual(SHOULDER_P * (desiredPosition - position) +
+                SHOULDER_F * Math.cos(Math.PI * position / ARM_VERTICAL));
     }
 
     /**
@@ -100,6 +99,6 @@ public class Arm {
      * @param power the input motor power
      */
     public void wristManual(double power) {
-        wrist.setPower(Range.clip(power, -ArmConstants.WRIST_MAX, ArmConstants.WRIST_MAX));
+        wrist.setPower(Range.clip(power, -WRIST_MAX, WRIST_MAX));
     }
 }

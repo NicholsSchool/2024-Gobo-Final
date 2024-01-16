@@ -20,8 +20,6 @@ public class LightsTeleop extends OpMode {
     private Lights lights;
 
     public static boolean isDefault;
-    public static boolean leftGreen;
-    public static boolean rightGray;
 
     /**
      * Code to run ONCE when the driver hits INIT
@@ -43,10 +41,7 @@ public class LightsTeleop extends OpMode {
         if(isDefault)
             lights.setDefaultPattern();
         else {
-            if(leftGreen)
-                lights.setLeftPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
-            if(rightGray)
-                lights.setRightPattern(RevBlinkinLedDriver.BlinkinPattern.GRAY);
+            lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.STROBE_GOLD);
         }
 
         telemetry.addData("loop time millis", loopTimer.time());

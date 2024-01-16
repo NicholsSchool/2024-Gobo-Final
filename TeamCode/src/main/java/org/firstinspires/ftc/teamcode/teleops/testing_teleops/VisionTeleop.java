@@ -52,7 +52,7 @@ public class VisionTeleop extends OpMode {
         TelemetryPacket packet = new TelemetryPacket(true);
         packet.fieldOverlay()
                 .setFill("green")
-                .fillRect(-x, -y, 14.0, 14.0);
+                .fillCircle(-x, -y, 14.0);
         dashboard.sendTelemetryPacket(packet);
 
         telemetry.addData("x", x);

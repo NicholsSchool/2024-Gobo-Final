@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.controller.Controller;
 
 //TODO: put color over the grid, do the correct rotation and scaling, and center the square
+//TODO: add a test for both profiles here
 
 /**
  * Teleop for testing Controller and Profiling functionalities
@@ -41,6 +42,7 @@ public class ControllerTeleop extends OpMode {
 
         double leftX = driverController.leftStickX.getValue();
         double leftY = driverController.leftStickY.getValue();
+
         telemetry.addData("left stick x", leftX);
         telemetry.addData("left stick y", leftY);
 

@@ -4,13 +4,13 @@ import androidx.annotation.NonNull;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.other.Constants.ControllerConstants;
-import org.firstinspires.ftc.teamcode.other.Constants.ProfileConstants;
+import org.firstinspires.ftc.teamcode.constants.ControllerConstants;
+import org.firstinspires.ftc.teamcode.constants.ProfileConstants;
 
 /**
  * An Axis on a Controller
  */
-public class Axis {
+public class Axis implements ControllerConstants, ProfileConstants {
     private final ElapsedTime timer;
     private final double deadband;
     private double value;
@@ -20,7 +20,7 @@ public class Axis {
      */
     public Axis() {
         timer = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
-        deadband = ControllerConstants.AXIS_DEADBAND;
+        deadband = AXIS_DEADBAND;
     }
 
     /**
@@ -42,13 +42,12 @@ public class Axis {
     }
 
     /**
-     * Whether the Axis value has been 0 for the minimum time interval
+     * Whether the Axis value has been zero for the minimum time interval
      *
-     * @return iff the timer is over the interval
+     * @return whether the timer is over the interval
      */
     public boolean zeroLongEnough() {
-        return timer.time() >=
-                ProfileConstants.MAX * ProfileConstants.MAX_SPEED + ControllerConstants.ZERO_WAIT;
+        return timer.time() >= MAX * MAX_SPEED + ZERO_WAIT;
     }
 
     /**
@@ -58,6 +57,6 @@ public class Axis {
      */
     @NonNull
     public String toString() {
-        return String.valueOf(value);
+        return "" + value;
     }
 }

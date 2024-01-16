@@ -3,12 +3,12 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.other.Constants.HandConstants;
+import org.firstinspires.ftc.teamcode.constants.HandConstants;
 
 /**
  * Robot Hand Subsystem
  */
-public class Hand {
+public class Hand implements HandConstants {
     private final Servo leftGrabber;
     private final Servo rightGrabber;
 
@@ -18,11 +18,11 @@ public class Hand {
     public Hand(HardwareMap hardwareMap) {
         leftGrabber = hardwareMap.get(Servo.class, "leftGrabber");
         leftGrabber.setDirection(Servo.Direction.FORWARD);
-        leftGrabber.scaleRange(HandConstants.LEFT_IN, HandConstants.LEFT_OUT);
+        leftGrabber.scaleRange(HandConstants.LEFT_IN, LEFT_OUT);
 
         rightGrabber = hardwareMap.get(Servo.class, "rightGrabber");
         rightGrabber.setDirection(Servo.Direction.FORWARD);
-        rightGrabber.scaleRange(HandConstants.RIGHT_OUT, HandConstants.RIGHT_IN);
+        rightGrabber.scaleRange(HandConstants.RIGHT_OUT, RIGHT_IN);
     }
 
     /**

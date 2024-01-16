@@ -2,21 +2,20 @@ package org.firstinspires.ftc.teamcode.teleops.sample_teleops;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.teamcode.constants.TeleopConstants;
 
 /**
  * A teleop to copy paste edit with
  */
-@TeleOp(name="SAMPLE TELEOP")
-public class SampleTeleop extends OpMode {
-    private ElapsedTime loopTimer;
-
+@TeleOp(name="SAMPLE COMPETITION TELEOP")
+public class SampleCompTeleop extends OpMode implements TeleopConstants {
     /**
      * Code to run ONCE when the driver hits INIT
      */
     @Override
     public void init() {
-        loopTimer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+
     }
 
     /**
@@ -40,9 +39,7 @@ public class SampleTeleop extends OpMode {
      */
     @Override
     public void loop() {
-        telemetry.addData("loop time millis", loopTimer.time());
-        loopTimer.reset();
-        telemetry.update();
+
     }
 
     /**

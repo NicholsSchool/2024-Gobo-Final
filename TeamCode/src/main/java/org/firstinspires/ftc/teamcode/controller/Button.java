@@ -13,11 +13,7 @@ public class Button {
     /**
      * Instantiates the Button
      */
-    public Button() {
-        isPressed = false;
-        wasPressed = false;
-        toggleState = false;
-    }
+    public Button() {}
 
     /**
      * Updates the Button with the new state
@@ -49,7 +45,7 @@ public class Button {
     }
 
     /**
-     * The Button's toggle state switches when the Button is pressed
+     * The Button's toggle state switches when the Button was just pressed
      *
      * @return the toggle state
      */
@@ -64,6 +60,6 @@ public class Button {
      */
     @NonNull
     public String toString() {
-        return String.valueOf(isPressed);
+        return "" + isPressed;
     }
 }

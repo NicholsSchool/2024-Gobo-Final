@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 @Autonomous(name="SAMPLE AUTO")
 public class SampleAuto extends LinearOpMode {
-    private final ElapsedTime runtime = new ElapsedTime();
+    private final ElapsedTime runtime = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
 
     /**
      * Runs the Auto routine
