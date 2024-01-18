@@ -15,12 +15,14 @@ import org.firstinspires.ftc.teamcode.controller.Controller;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Lights;
 
+//TODO: test the RUN_USING_ENCODER effect on loop time
+
 /**
  * A teleop for testing Drivetrain functionalities
  */
 @Config
-@TeleOp(name="[DASHBOARD] Drivetrain Testing")
-public class DrivetrainTeleop extends OpMode implements TeleopConstants, DriveConstants {
+@TeleOp(name="[DASHBOARD] Odometry Tuning")
+public class OdometryTuningTeleop extends OpMode implements TeleopConstants, DriveConstants {
     private ElapsedTime loopTimer;
     private Controller driverController;
     private Drivetrain drivetrain;
@@ -37,7 +39,8 @@ public class DrivetrainTeleop extends OpMode implements TeleopConstants, DriveCo
     @Override
     public void init() {
         driverController = new Controller(gamepad1);
-        drivetrain = new Drivetrain(hardwareMap, IS_BLUE_ALLIANCE, -48.0, -48.0, 90.0);
+        drivetrain = new Drivetrain(hardwareMap, IS_BLUE_ALLIANCE, 0.0, 0.0, 90.0);
+        drivetrain.setFloat();
         lights = new Lights(hardwareMap, IS_BLUE_ALLIANCE);
 
         alignAngles = new double[]{90.0, -90.0, 0.0, -180.0};
@@ -53,55 +56,6 @@ public class DrivetrainTeleop extends OpMode implements TeleopConstants, DriveCo
     @Override
     public void loop() {
         drivetrain.update();
-        driverController.update();
-
-        double x = driverController.leftStickX.getValue();
-        double y = driverController.leftStickY.getValue();
-        double turn = driverController.rightStickX.getValue();
-
-        boolean lowGear = driverController.leftTrigger.getValue() <= 0.5;
-
-        if(lowGear) {
-            x *= LOW_GEAR;
-            y *= LOW_GEAR;
-        }
-        else {
-            x *= HIGH_GEAR;
-            y *= HIGH_GEAR;
-        }
-
-        boolean autoAlign = driverController.rightStickX.zeroLongEnough();
-
-        if(!autoAlign)
-            drivetrain.setDesiredHeading(drivetrain.getFieldHeading());
-        else if(driverController.y.wasJustPressed())
-            drivetrain.setDesiredHeading(alignAngles[0]);
-        else if(driverController.a.wasJustPressed())
-            drivetrain.setDesiredHeading(alignAngles[1]);
-        else if(driverController.b.wasJustPressed())
-            drivetrain.setDesiredHeading(alignAngles[2]);
-        else if(driverController.x.wasJustPressed())
-            drivetrain.setDesiredHeading(alignAngles[3]);
-
-        blueSplineControls();
-
-        if(x != 0.0 || y != 0.0 || driverController.leftStick.wasJustPressed()) {
-            splineToScoring = false;
-            splineToIntake = false;
-        }
-
-        if(splineToIntake) {
-            lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.STROBE_WHITE);
-            drivetrain.splineToIntake(turn, autoAlign, lowGear);
-        }
-        else if(splineToScoring) {
-            lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.STROBE_GOLD);
-            drivetrain.splineToScoring(turn, autoAlign, splineScoringY, lowGear);
-        }
-        else {
-            lights.setDefaultPattern();
-            drivetrain.drive(x, y, turn, autoAlign, lowGear);
-        }
 
         double[] xy = drivetrain.getXY();
 

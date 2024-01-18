@@ -10,12 +10,10 @@ import org.firstinspires.ftc.teamcode.other.CoordinateMotionProfile;
 import org.firstinspires.ftc.teamcode.other.MotionProfile;
 import org.firstinspires.ftc.teamcode.constants.DriveConstants;
 
-//TODO: tune the drive motors ff OR remove drive encoders
 //TODO: tune spline p
 //TODO: tune spline error
 //TODO: edit all spline waypoints
 //TODO: tune the driving profile speed
-//TODO: tune the odometry correction
 
 /**
  * Robot Drivetrain Subsystem
@@ -210,16 +208,16 @@ public class Drivetrain implements DriveConstants {
 
         double deltaX = (currentLeft - previousLeftPosition + currentRight - previousRightPosition) *
                 INCHES_PER_TICK * STRAFE_ODOMETRY_CORRECTION;
-        double deltaY = currentFront - previousFrontPosition * INCHES_PER_TICK * FORWARD_ODOMETRY_CORRECTION;
+        double deltaY = (currentFront - previousFrontPosition) *
+                INCHES_PER_TICK * FORWARD_ODOMETRY_CORRECTION;
 
         heading = imuOffset - navx.getYaw();
 
         double headingRadians = Math.toRadians(heading);
         double prevHeadingRadians = Math.toRadians(previousHeading);
 
-        double averagedHeadingRadians = Math.atan2(
-                0.5 * (Math.sin(headingRadians) + Math.sin(prevHeadingRadians)),
-                0.5 * (Math.cos(headingRadians) + Math.cos(prevHeadingRadians)));
+        double averagedHeadingRadians = Math.atan2(Math.sin(headingRadians) + Math.sin(prevHeadingRadians),
+                Math.cos(headingRadians) + Math.cos(prevHeadingRadians));
 
         x += deltaX * Math.sin(averagedHeadingRadians) + deltaY * Math.cos(averagedHeadingRadians);
         y += -deltaX * Math.cos(averagedHeadingRadians) + deltaY * Math.sin(averagedHeadingRadians);
@@ -236,8 +234,6 @@ public class Drivetrain implements DriveConstants {
      * @param pose the x, y, theta of the robot
      */
     public void setPose(double[] pose) {
-        if(pose == null)
-            return;
         x = pose[0];
         y = pose[1];
         imuOffset = pose[2] + navx.getYaw();
@@ -250,15 +246,6 @@ public class Drivetrain implements DriveConstants {
         leftDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
         rightDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
         backDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-    }
-
-    /**
-     * Sets the Drive Wheels to the RUN-WITHOUT_ENCODER run mode
-     */
-    public void disableDriveEncoders() {
-        leftDrive.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        rightDrive.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        backDrive.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     /**

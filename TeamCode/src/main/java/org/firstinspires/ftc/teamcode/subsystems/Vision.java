@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-//TODO: decide if small april tags are worth it
-
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import java.util.ArrayList;
@@ -61,16 +59,21 @@ public class Vision implements ProfileConstants, VisionConstants {
         double[] poseSum = new double[4];
 
         size = detections.size();
-        if(size == 0)
-            return null;
 
         for(int i = 0; i < size; i++) {
             double[] currentPose = addWeights(localize(i));
-            poseSum[0] += currentPose[0];
-            poseSum[1] += currentPose[1];
-            poseSum[2] += currentPose[2];
-            poseSum[3] += currentPose[3];
+            if(currentPose == null)
+                size--;
+            else {
+                poseSum[0] += currentPose[0];
+                poseSum[1] += currentPose[1];
+                poseSum[2] += currentPose[2];
+                poseSum[3] += currentPose[3];
+            }
         }
+
+        if(size == 0)
+            return null;
 
         double[] smoothedXY = smoothing.update(poseSum[0] / weightsSum, poseSum[1] / weightsSum);
         return new double[]{smoothedXY[0], smoothedXY[1], Math.toDegrees(Math.atan2(poseSum[3],poseSum[2]))};
@@ -78,6 +81,9 @@ public class Vision implements ProfileConstants, VisionConstants {
 
     private double[] localize(int i) {
         AprilTagDetection aprilTagDetection = detections.get(i);
+
+        if(aprilTagDetection.metadata == null)
+            return null;
 
         int id = aprilTagDetection.id;
         boolean isScoringTag = id <= 6;
@@ -131,6 +137,9 @@ public class Vision implements ProfileConstants, VisionConstants {
     }
 
     private double[] addWeights(double[] data) {
+        if(data == null)
+            return null;
+
         double weighting = (data[4] == 7.0 || data[4] == 10.0 ? BIG_TAG_AREA : SMALL_TAG_AREA) /
                 (data[3] * data[3]);
 
@@ -145,9 +154,9 @@ public class Vision implements ProfileConstants, VisionConstants {
     }
 
     /**
-     * Returns the number of April Tag Detections
+     * Returns the number of useful April Tag Detections
      *
-     * @return the number of detections
+     * @return the number of useful detections
      */
     public int getNumDetections() {
         return size;

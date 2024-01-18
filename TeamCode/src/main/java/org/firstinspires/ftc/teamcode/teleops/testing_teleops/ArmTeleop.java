@@ -23,6 +23,7 @@ public class ArmTeleop extends OpMode {
     public static int armDesiredPosition;
     public static double wristPower;
     public static boolean launchPlane;
+    public static boolean isFloat;
 
     /**
      * Code to run ONCE when the driver hits INIT
@@ -40,6 +41,9 @@ public class ArmTeleop extends OpMode {
      */
     @Override
     public void loop() {
+        if(isFloat)
+            arm.setFloat();
+
         if(climb)
             arm.climb(shoulderPower);
         else if(armGoToPos)

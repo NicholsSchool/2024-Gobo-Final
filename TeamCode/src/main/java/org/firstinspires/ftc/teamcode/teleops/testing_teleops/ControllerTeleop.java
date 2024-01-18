@@ -9,9 +9,10 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.controller.Controller;
+import org.firstinspires.ftc.teamcode.other.CoordinateMotionProfile;
+import org.firstinspires.ftc.teamcode.other.MotionProfile;
 
 //TODO: put color over the grid, do the correct rotation and scaling, and center the square
-//TODO: add a test for both profiles here
 
 /**
  * Teleop for testing Controller and Profiling functionalities
@@ -21,7 +22,10 @@ import org.firstinspires.ftc.teamcode.controller.Controller;
 public class ControllerTeleop extends OpMode {
     private Controller driverController;
     private ElapsedTime loopTimer;
+    private CoordinateMotionProfile joystickProfile;
+    private MotionProfile axisProfile;
     private final FtcDashboard dashboard = FtcDashboard.getInstance();
+    public static boolean clip;
 
     /**
      * Code to run ONCE when the driver hits INIT
@@ -29,6 +33,9 @@ public class ControllerTeleop extends OpMode {
     @Override
     public void init() {
         driverController = new Controller(gamepad1);
+        joystickProfile = new CoordinateMotionProfile();
+        axisProfile = new MotionProfile();
+
         loopTimer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
     }
@@ -40,18 +47,26 @@ public class ControllerTeleop extends OpMode {
     public void loop() {
         driverController.update();
 
-        double leftX = driverController.leftStickX.getValue();
-        double leftY = driverController.leftStickY.getValue();
+        double[] xy;
+        if(clip)
+            xy = joystickProfile.update(
+                    driverController.leftStickX.getValue(), driverController.leftStickY.getValue(), 0.5);
+        else
+            xy = joystickProfile.update(
+                    driverController.leftStickX.getValue(), driverController.leftStickY.getValue());
 
-        telemetry.addData("left stick x", leftX);
-        telemetry.addData("left stick y", leftY);
+        telemetry.addData("left stick x", xy[0]);
+        telemetry.addData("left stick y", xy[1]);
 
         TelemetryPacket packet = new TelemetryPacket(false);
         packet.fieldOverlay()
                 .drawGrid(0.0, 0.0, 144.0, 144.0, 21, 21)
                 .setFill("red")
-                .fillRect(leftY * 72, -leftX * 72, 7.2, 7.2);
+                .fillRect(xy[1] * 72, -xy[0] * 72, 7.2, 7.2);
         dashboard.sendTelemetryPacket(packet);
+
+        double turn = axisProfile.update(driverController.rightStickX.getValue() * 0.25);
+        telemetry.addData("right stick x", turn);
 
         telemetry.addData("loop time millis", loopTimer.time());
         loopTimer.reset();

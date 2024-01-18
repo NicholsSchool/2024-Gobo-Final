@@ -27,7 +27,6 @@ public class LightsTeleop extends OpMode {
     @Override
     public void init() {
         lights = new Lights(hardwareMap, true);
-        isDefault = true;
 
         loopTimer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());

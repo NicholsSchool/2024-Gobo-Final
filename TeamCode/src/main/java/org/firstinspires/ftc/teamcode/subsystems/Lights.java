@@ -25,7 +25,7 @@ public class Lights {
         rightBlinkin = hwMap.get(RevBlinkinLedDriver.class, "rightBlinkin");
 
         defaultPattern = isBlueAlliance ? BlinkinPattern.BLUE : BlinkinPattern.RED;
-        setPattern(defaultPattern);
+        setPattern(BlinkinPattern.GREEN);
     }
 
     /** Sets both left and right LED strips to a certain color pattern.

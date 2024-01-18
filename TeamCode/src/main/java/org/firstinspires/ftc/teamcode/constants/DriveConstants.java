@@ -22,11 +22,8 @@ public interface DriveConstants {
     /** The Closest to Driver Scoring Y For Red Alliance */
     double RED_SCORING_Y_CLOSE = 42.0;
 
-    /** Max Motor Speed of Drive Motors in Ticks per second */
-    int MAX_MOTOR_VEL = 2800;
-
     /** Auto Driving Proportional Constant */
-    double SPLINE_P = 0.025;
+    double SPLINE_P = 0.05;
 
     /** Auto Driving allowed error */
     double SPLINE_ERROR = 2.0;
@@ -47,10 +44,10 @@ public interface DriveConstants {
     double BACK_DRIVE_OFFSET = 270.0;
 
     /** Low Gear Max Speed */
-    double LOW_GEAR = 0.45;
+    double LOW_GEAR = 0.375;
 
     /** High Gear Max Speed */
-    double HIGH_GEAR = 0.9;
+    double HIGH_GEAR = 0.75;
 
     /** Auto Align Proportional Constant */
     double AUTO_ALIGN_P = 0.005;
@@ -89,8 +86,8 @@ public interface DriveConstants {
     double INCHES_PER_TICK = DEAD_WHEEL_DIAMETER * Math.PI / THRU_BORE_TICKS_PER_REV;
 
     /** Horizontal Correction coefficient */
-    double STRAFE_ODOMETRY_CORRECTION = 1.0;
+    double STRAFE_ODOMETRY_CORRECTION = 0.576;
 
     /** Forward Correction coefficient */
-    double FORWARD_ODOMETRY_CORRECTION = 1.0;
+    double FORWARD_ODOMETRY_CORRECTION = 0.964;
 }

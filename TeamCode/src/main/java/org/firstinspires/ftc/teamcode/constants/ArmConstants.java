@@ -7,6 +7,9 @@ public interface ArmConstants {
     /** Shoulder Max Power */
     double SHOULDER_MAX = 0.3;
 
+    /** Climbing Max Power */
+    double CLIMB_MAX = 0.75;
+
     /** Wrist Max Power */
     double WRIST_MAX = 0.5;
 
@@ -22,6 +25,9 @@ public interface ArmConstants {
     /** Shoulder Scaling Factor Constant */
     double SHOULDER_F = 0.05;
 
+    /** Arm Starting Position Offset */
+    int ARM_STARTING_POS = 415;
+
     /** Arm Vertical Encoder Position */
-    double ARM_VERTICAL = 2850.0;
+    double ARM_VERTICAL = 2770.0;
 }

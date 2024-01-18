@@ -6,15 +6,19 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.constants.ArmConstants;
+import org.firstinspires.ftc.teamcode.constants.ProfileConstants;
+import org.firstinspires.ftc.teamcode.other.MotionProfile;
 
 /**
  * Robot Arm Subsystem
  */
-public class Arm implements ArmConstants {
+public class Arm implements ArmConstants, ProfileConstants {
     private final DcMotorEx leftShoulder;
     private final DcMotorEx rightShoulder;
     private final DcMotorEx wrist;
     private final Servo planeLauncher;
+    private final MotionProfile climbProfile;
+    private int encoderOffset;
 
     /**
      * Initializes the Arm
@@ -41,6 +45,8 @@ public class Arm implements ArmConstants {
         planeLauncher = hardwareMap.get(Servo.class, "planeLauncher");
         planeLauncher.setDirection(Servo.Direction.FORWARD);
         planeLauncher.scaleRange(ArmConstants.PLANE_MIN, ArmConstants.PLANE_MAX);
+
+        climbProfile = new MotionProfile(0.0, -CLIMB_MAX, CLIMB_MAX, CLIMB_MAX_SPEED);
     }
 
     /**
@@ -69,6 +75,7 @@ public class Arm implements ArmConstants {
      * @param power the input motor power
      */
     public void climb(double power) {
+        power = climbProfile.update(power);
         leftShoulder.setPower(power);
         rightShoulder.setPower(power);
     }
@@ -79,7 +86,7 @@ public class Arm implements ArmConstants {
      * @return the encoder position of the arm
      */
     public int getArmPosition() {
-        return leftShoulder.getCurrentPosition();
+        return leftShoulder.getCurrentPosition() - encoderOffset;
     }
 
     /**
@@ -100,5 +107,20 @@ public class Arm implements ArmConstants {
      */
     public void wristManual(double power) {
         wrist.setPower(Range.clip(power, -WRIST_MAX, WRIST_MAX));
+    }
+
+    /**
+     * Sets the arm to Float mode
+     */
+    public void setFloat() {
+        leftShoulder.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+        rightShoulder.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+    }
+
+    /**
+     * Resets the arm encoder. Use when the arm is in the down position
+     */
+    public void resetEncoder() {
+        encoderOffset = leftShoulder.getCurrentPosition();
     }
 }
