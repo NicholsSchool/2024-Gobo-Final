@@ -30,6 +30,7 @@ public class Robot implements DriveConstants, ArmConstants {
     private final Vision vision;
     private final Telemetry telemetry;
     private final ElapsedTime loopTimer;
+    private final ElapsedTime planeTimer;
     private final boolean isBlueAlliance;
     private final double[] alignAngles;
     private boolean hasSeenAprilTag;
@@ -37,6 +38,8 @@ public class Robot implements DriveConstants, ArmConstants {
     private boolean splineToScoring;
     private double splineScoringY;
     private double armDesiredPosition;
+    private boolean leftClamp = true;
+    private boolean rightClamp = true;
 
     /**
      * Instantiates the Robot. Call during init()
@@ -60,10 +63,13 @@ public class Robot implements DriveConstants, ArmConstants {
         lights = new Lights(hwMap, isBlue);
         vision = new Vision(hwMap, pose[0], pose[1]);
 
+        arm.launchPlane(false);
+
         alignAngles = isBlue ? new double[]{90.0, -90.0, 0.0, -180.0} : new double[]{-90.0, 90.0, -180.0, 0.0};
 
         this.telemetry = telemetry;
         loopTimer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+        planeTimer = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
     }
 
     /**
@@ -82,8 +88,12 @@ public class Robot implements DriveConstants, ArmConstants {
         operatorController.update();
 
         double[] visionPose = null;
-        if(driverController.back.isPressed())
+        if(driverController.back.isPressed()) {
             visionPose = vision.update();
+            if(visionPose != null){
+                lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
+            }
+        }
 
         if(!hasSeenAprilTag && visionPose != null)
                 hasSeenAprilTag = true;
@@ -98,7 +108,7 @@ public class Robot implements DriveConstants, ArmConstants {
         double y = driverController.leftStickY.getValue();
         double turn = driverController.rightStickX.getValue();
 
-        boolean lowGear = driverController.leftTrigger.getValue() <= 0.5;
+        boolean lowGear = driverController.leftBumper.toggleState();
 
         if(!isBlueAlliance) {
             x *= -1;
@@ -189,12 +199,12 @@ public class Robot implements DriveConstants, ArmConstants {
             armDesiredPosition = 2420.0;
         else if(operatorController.dpadDown.isPressed())
             armDesiredPosition = 220.0;
-        else if(operatorController.dpadLeft.isPressed() && isBlueAlliance ||
-                operatorController.dpadRight.isPressed() && !isBlueAlliance)
-            armDesiredPosition = 1220.0;
-        else if(operatorController.dpadLeft.isPressed() && !isBlueAlliance ||
-                operatorController.dpadRight.isPressed() && isBlueAlliance)
-            armDesiredPosition = 1520;
+//        else if(operatorController.dpadLeft.isPressed() && isBlueAlliance ||
+//                operatorController.dpadRight.isPressed() && !isBlueAlliance)
+//            armDesiredPosition = 1220.0;
+//        else if(operatorController.dpadLeft.isPressed() && !isBlueAlliance ||
+//                operatorController.dpadRight.isPressed() && isBlueAlliance)
+//            armDesiredPosition = 1520;
 
         if(operatorController.leftTrigger.getValue() > 0.0) {
             arm.climb(-operatorController.leftTrigger.getValue());
@@ -209,10 +219,42 @@ public class Robot implements DriveConstants, ArmConstants {
 
         arm.wristManual(WRIST_MAX * operatorController.rightStickY.getValue());
 
-        arm.launchPlane(operatorController.back.isPressed());
 
-        hand.leftGrabber(operatorController.leftBumper.toggleState());
-        hand.rightGrabber(operatorController.rightBumper.toggleState());
+        if(operatorController.back.isPressed() && !isBlueAlliance) {
+            armDesiredPosition = 1520;
+            drivetrain.setDesiredHeading(alignAngles[3]);
+            if(drivetrain.getFieldHeading() < alignAngles[3] + 20 && drivetrain.getFieldHeading() > alignAngles[3] - 20) {
+                arm.launchPlane(true);
+                if(planeTimer.time() > 2){
+                    arm.launchPlane(false);
+                }
+            }else{
+                planeTimer.reset();
+            }
+        }
+
+        if(operatorController.back.isPressed() && isBlueAlliance) {
+            armDesiredPosition = 1520;
+            drivetrain.setDesiredHeading(alignAngles[2]);
+            if(drivetrain.getFieldHeading() < alignAngles[2] + 20 && drivetrain.getFieldHeading() > alignAngles[2] - 20) {
+                arm.launchPlane(true);
+                if(planeTimer.time() > 2){
+                    arm.launchPlane(false);
+                }
+            }else{
+                planeTimer.reset();
+            }
+        }
+
+        if(operatorController.x.wasJustPressed() || operatorController.a.wasJustPressed()){
+            leftClamp = !leftClamp;
+        }
+        if(operatorController.b.wasJustPressed() || operatorController.a.wasJustPressed()){
+            rightClamp = !rightClamp;
+        }
+
+        hand.leftGrabber(leftClamp);
+        hand.rightGrabber(rightClamp);
     }
 
     private void signalLights() {
@@ -229,6 +271,9 @@ public class Robot implements DriveConstants, ArmConstants {
     private void outputTelemetry() {
         telemetry.addData("imu", drivetrain.getFieldHeading());
         telemetry.addData("loop time", loopTimer.time());
+        telemetry.addData("x", drivetrain.getXY()[0]);
+        telemetry.addData("y",drivetrain.getXY()[1]);
+        telemetry.addData("arm", arm.getArmPosition());
         loopTimer.reset();
         telemetry.update();
     }

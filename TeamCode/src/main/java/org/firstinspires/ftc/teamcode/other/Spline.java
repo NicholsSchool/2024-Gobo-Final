@@ -1,4 +1,4 @@
-package Spline;
+package org.firstinspires.ftc.teamcode.other;
 
 import java.util.stream.DoubleStream;
 
@@ -13,7 +13,7 @@ public class Spline {
     private double[][] points;
     private double correctionDistance;
     public double[] robotPosition;
-    private DriveTrain drivetrain;
+    private Drivetrain drivetrain;
     private int steps;
 
     /**
@@ -21,10 +21,10 @@ public class Spline {
      * Highly recommend graphing the curves using Desmos (link in readme soon).
      * @param points input points (should be 4)
      * @param correctionDistance how far off should the bot be before curving back on
-     * @param robotPosition starting point of robot
+     * @param drivetrain the bots drivetrain
      * @param steps number of intervals desired t is broken into (larger means more precise)
      */
-    public Spline(double[][] points, double correctionDistance, DriveTrain drivetrain, int steps) {
+    public Spline(double[][] points, double correctionDistance, Drivetrain drivetrain, int steps) {
         
         this.points = points;
         this.correctionDistance = correctionDistance;
@@ -34,12 +34,12 @@ public class Spline {
 
     /**
      * updates the position of robot
-     * @param robotPosition robots current position (x,y)
      */
-    public void update(double[] robotPosition){
+    public void update(){
 
         drivetrain.update();
-        robotPosition = new double[]{dt.getX(), dt.getY()};
+        //I'm so sorry for this
+        robotPosition = new double[]{drivetrain.getXY()[0], drivetrain.getXY()[1]};
 
     }
 
@@ -71,8 +71,8 @@ public class Spline {
         
         double y1 = points[0][1];
         double y2 = points[1][1]; 
-        double y3 = points[2][1];
-        double y4 = points[3][1];
+        double y3 = -1 * points[2][1];
+        double y4 = -1 * points[3][1];
 
         double by = Math.pow(1-t,3) * y1 + 3 * t * Math.pow(1-t,2) * y2 + 3 * Math.pow(t,2) * (1-t) * y3 + Math.pow(t, 3) * y4;
 
