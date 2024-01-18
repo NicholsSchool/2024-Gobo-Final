@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.autos;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.other.Spline;
 
@@ -30,7 +31,9 @@ public class SampleAuto extends LinearOpMode {
 
         while(spline.desiredT() < 0.9){
             spline.update();
-            drivetrain.drive(0.7 * Math.cos(spline.angle()), 0.7 * Math.sin(spline.angle()), 0, false, false);
+            double power = 0.7 * Range.clip(1.4 - spline.desiredT(), 0, 1);
+
+            drivetrain.drive(power * Math.cos(spline.angle()), power * Math.sin(spline.angle()), 0, false, false);
             if(sampleTime.time() > 30) {
                 spline.update();
                 sampleTime.reset();
