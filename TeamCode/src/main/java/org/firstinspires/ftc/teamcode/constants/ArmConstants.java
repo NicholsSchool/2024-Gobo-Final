@@ -36,4 +36,6 @@ public interface ArmConstants {
 
     /** Core Hex Ticks per Revolution */
     double CORE_HEX_TICKS_PER_REV = 288;
+    /** Wrist Encoder Offset For Start Of Auto*/
+    double WRIST_AUTO_POSITION = -192;
 }
