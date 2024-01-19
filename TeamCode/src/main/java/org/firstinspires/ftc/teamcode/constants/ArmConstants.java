@@ -26,7 +26,7 @@ public interface ArmConstants {
     double SHOULDER_F = 0.05;
 
     /** Arm Starting Position Offset */
-    int ARM_STARTING_POS = 415;
+    int ARM_STARTING_POS = 550;
 
     /** Arm Vertical Encoder Position */
     double ARM_VERTICAL = 2770.0;

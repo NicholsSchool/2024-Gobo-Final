@@ -100,6 +100,15 @@ public class Arm implements ArmConstants, ProfileConstants {
                 SHOULDER_F * Math.cos(Math.PI * position / ARM_VERTICAL));
     }
 
+    public int getWristPosition(){
+        return wrist.getCurrentPosition();
+    }
+
+    public void wristToPosition(int desiredPosition){
+        int position = getWristPosition();
+        wristManual(SHOULDER_P * 5 * (desiredPosition - position));
+    }
+
     /**
      * Moves the wrist motor manually
      *
