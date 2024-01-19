@@ -23,24 +23,48 @@ public class SampleAuto extends LinearOpMode {
         ElapsedTime sampleTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
         Drivetrain drivetrain = new Drivetrain(hardwareMap, true, 36, -60, 90);
 
-        double[][] points = new double[][]{{36, -60,}, {47.9, 31.4}, {-38.1, 8}, {-38, 58}};
+        double[][] points1 = new double[][]{{36, -60,}, {47.9, 31.4}, {-38.1, 8}, {-38, -58}};
+        double[][] points2 = new double[][]{{-38, -58,}, {85.3, -2.6}, {0.7, 25.7}, {-21.8, -6.5}};
 
-        Spline spline = new Spline(points, 20, drivetrain, 100);
-        spline.update();
+        Spline spline1 = new Spline(points1, 20, drivetrain, 100);
+        Spline spline2 = new Spline(points2, 20, drivetrain, 100);
+        spline1.update();
+        spline2.update();
         waitForStart();
 
-        while(spline.desiredT() < 0.9){
-            spline.update();
-            double power = 0.7 * Range.clip(1.4 - spline.desiredT(), 0, 1);
+        while(spline1.desiredT() < 0.95){
+            spline1.update();
+            spline2.update();
+            double power1 = 0.7 * Range.clip(1.4 - spline1.desiredT(), 0, 1);
 
-            drivetrain.drive(power * Math.cos(spline.angle()), power * Math.sin(spline.angle()), 0, false, false);
+            drivetrain.drive(power1 * Math.cos(spline1.angle()), power1 * Math.sin(spline1.angle()), 0, false, false);
             if(sampleTime.time() > 30) {
-                spline.update();
+                spline1.update();
                 sampleTime.reset();
             }
             telemetry.addData("x", drivetrain.getXY()[0]);
             telemetry.addData("y", drivetrain.getXY()[1]);
-            telemetry.addData("t", spline.desiredT());
+            telemetry.addData("t", spline1.desiredT());
+            telemetry.addData("bezierX", spline1.bezierX(spline1.desiredT()));
+            telemetry.addData("bezierY", spline1.bezierY(spline1.desiredT()));
+            telemetry.addData("t2",(spline2.desiredT()));
+            telemetry.update();
+        }
+        spline2.update();
+        while(spline2.desiredT() < 0.95){
+            spline2.update();
+            double power2 = 0.7 * Range.clip(1.4 - spline2.desiredT(), 0, 1);
+
+            drivetrain.drive(power2 * Math.cos(spline2.angle()), power2 * Math.sin(spline2.angle()), 0, false, false);
+            if(sampleTime.time() > 30) {
+                spline2.update();
+                sampleTime.reset();
+            }
+            telemetry.addData("x", drivetrain.getXY()[0]);
+            telemetry.addData("y", drivetrain.getXY()[1]);
+            telemetry.addData("t", spline2.desiredT());
+            telemetry.addData("bezierX", spline2.bezierX(spline2.desiredT()));
+            telemetry.addData("bezierY", spline2.bezierY(spline2.desiredT()));
             telemetry.update();
         }
         drivetrain.drive(0,0,0,false,false);

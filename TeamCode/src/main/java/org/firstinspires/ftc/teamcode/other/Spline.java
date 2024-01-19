@@ -71,8 +71,8 @@ public class Spline {
         
         double y1 = points[0][1];
         double y2 = points[1][1]; 
-        double y3 = -1 * points[2][1];
-        double y4 = -1 * points[3][1];
+        double y3 = points[2][1];
+        double y4 = points[3][1];
 
         double by = Math.pow(1-t,3) * y1 + 3 * t * Math.pow(1-t,2) * y2 + 3 * Math.pow(t,2) * (1-t) * y3 + Math.pow(t, 3) * y4;
 
