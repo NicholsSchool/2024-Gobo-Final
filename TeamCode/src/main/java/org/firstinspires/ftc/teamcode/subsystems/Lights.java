@@ -5,7 +5,7 @@ import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver.BlinkinPattern;
 
 /**
- * Robot Indicator Lights Subsystem
+ * TeleopRobot Indicator Lights Subsystem
  * A full list of REV Blinkin patterns can be found
  * <a href="https://first-tech-challenge.github.io/SkyStone/com/qualcomm/hardware/rev/RevBlinkinLedDriver.BlinkinPattern.html">here</a>.
  */

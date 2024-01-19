@@ -18,9 +18,9 @@ import org.firstinspires.ftc.teamcode.subsystems.Vision;
 //TODO: remove telemetry method after checking final loop time
 
 /**
- * Integrates Robot Subsystems and Controllers
+ * Integrates TeleopRobot Subsystems and Controllers
  */
-public class Robot implements DriveConstants, ArmConstants {
+public class TeleopRobot implements DriveConstants, ArmConstants {
     private final Controller driverController;
     private final Controller operatorController;
     private final Drivetrain drivetrain;
@@ -33,16 +33,15 @@ public class Robot implements DriveConstants, ArmConstants {
     private final ElapsedTime planeTimer;
     private final boolean isBlueAlliance;
     private final double[] alignAngles;
-    private boolean hasSeenAprilTag;
     private boolean splineToIntake;
     private boolean splineToScoring;
     private double splineScoringY;
     private double armDesiredPosition;
-    private boolean leftClamp = true;
-    private boolean rightClamp = true;
+    private boolean leftClamp;
+    private boolean rightClamp;
 
     /**
-     * Instantiates the Robot. Call during init()
+     * Instantiates the TeleopRobot. Call during init()
      *
      * @param hwMap the hardware map
      * @param isBlue whether we are blue alliance
@@ -51,7 +50,7 @@ public class Robot implements DriveConstants, ArmConstants {
      * @param telemetry the telemetry
      * @param pose the robot's initial pose [x, y, theta]
      */
-    public Robot(HardwareMap hwMap, boolean isBlue, Gamepad g1, Gamepad g2, Telemetry telemetry, double[] pose) {
+    public TeleopRobot(HardwareMap hwMap, boolean isBlue, Gamepad g1, Gamepad g2, Telemetry telemetry, double[] pose) {
         this.isBlueAlliance = isBlue;
 
         driverController = new Controller(g1);
@@ -63,7 +62,8 @@ public class Robot implements DriveConstants, ArmConstants {
         lights = new Lights(hwMap, isBlue);
         vision = new Vision(hwMap, pose[0], pose[1]);
 
-        arm.launchPlane(false);
+        leftClamp = true;
+        rightClamp = true;
 
         alignAngles = isBlue ? new double[]{90.0, -90.0, 0.0, -180.0} : new double[]{-90.0, 90.0, -180.0, 0.0};
 
@@ -73,7 +73,7 @@ public class Robot implements DriveConstants, ArmConstants {
     }
 
     /**
-     * Full Robot functionalities. Call in each loop()
+     * Full TeleopRobot functionalities. Call in each loop()
      */
     public void update() {
         updateInstances();
@@ -87,19 +87,15 @@ public class Robot implements DriveConstants, ArmConstants {
         driverController.update();
         operatorController.update();
 
-        double[] visionPose = null;
+        double[] visionPose;
         if(driverController.back.isPressed()) {
             visionPose = vision.update();
             if(visionPose != null){
+                drivetrain.setPose(visionPose);
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
             }
         }
 
-        if(!hasSeenAprilTag && visionPose != null)
-                hasSeenAprilTag = true;
-
-        if(visionPose != null)
-            drivetrain.setPose(visionPose);
         drivetrain.update();
     }
 
@@ -108,7 +104,7 @@ public class Robot implements DriveConstants, ArmConstants {
         double y = driverController.leftStickY.getValue();
         double turn = driverController.rightStickX.getValue();
 
-        boolean lowGear = driverController.leftBumper.toggleState();
+        boolean lowGear = driverController.leftTrigger.getValue() <= 0.5;
 
         if(!isBlueAlliance) {
             x *= -1;
@@ -147,11 +143,11 @@ public class Robot implements DriveConstants, ArmConstants {
             splineToIntake = false;
         }
 
-//        if(splineToIntake)
-//            drivetrain.splineToIntake(turn, autoAlign, lowGear);
-//        else if(splineToScoring)
-//            drivetrain.splineToScoring(turn, autoAlign, splineScoringY, lowGear);
-//        else
+        if(splineToIntake)
+            drivetrain.splineToIntake(turn, autoAlign, lowGear);
+        else if(splineToScoring)
+            drivetrain.splineToScoring(turn, autoAlign, splineScoringY, lowGear);
+        else
             drivetrain.drive(x, y, turn, autoAlign, lowGear);
     }
 
@@ -199,12 +195,12 @@ public class Robot implements DriveConstants, ArmConstants {
             armDesiredPosition = 2420.0;
         else if(operatorController.dpadDown.isPressed())
             armDesiredPosition = 220.0;
-//        else if(operatorController.dpadLeft.isPressed() && isBlueAlliance ||
-//                operatorController.dpadRight.isPressed() && !isBlueAlliance)
-//            armDesiredPosition = 1220.0;
-//        else if(operatorController.dpadLeft.isPressed() && !isBlueAlliance ||
-//                operatorController.dpadRight.isPressed() && isBlueAlliance)
-//            armDesiredPosition = 1520;
+        else if(operatorController.dpadLeft.isPressed() && isBlueAlliance ||
+                operatorController.dpadRight.isPressed() && !isBlueAlliance)
+            armDesiredPosition = 1220.0;
+        else if(operatorController.dpadLeft.isPressed() && !isBlueAlliance ||
+                operatorController.dpadRight.isPressed() && isBlueAlliance)
+            armDesiredPosition = 1520;
 
         if(operatorController.leftTrigger.getValue() > 0.0) {
             arm.climb(-operatorController.leftTrigger.getValue());
@@ -220,36 +216,29 @@ public class Robot implements DriveConstants, ArmConstants {
         arm.wristManual(WRIST_MAX * operatorController.rightStickY.getValue());
 
 
-        if(operatorController.back.isPressed() && !isBlueAlliance) {
+        if(operatorController.back.isPressed()) {
+            double alignAngle;
+            if(isBlueAlliance)
+                alignAngle = alignAngles[2];
+            else
+                alignAngle = alignAngles[3];
+
             armDesiredPosition = 1520;
-            drivetrain.setDesiredHeading(alignAngles[3]);
-            if(drivetrain.getFieldHeading() < alignAngles[3] + 20 && drivetrain.getFieldHeading() > alignAngles[3] - 20) {
+            drivetrain.setDesiredHeading(alignAngle);
+            if(Math.abs(drivetrain.getFieldHeading()) <= 4.0 * AUTO_ALIGN_ERROR) {
                 arm.launchPlane(true);
-                if(planeTimer.time() > 2){
+                if(planeTimer.time() > 1.0)
                     arm.launchPlane(false);
-                }
-            }else{
-                planeTimer.reset();
             }
+            else
+                planeTimer.reset();
         }
 
-        if(operatorController.back.isPressed() && isBlueAlliance) {
-            armDesiredPosition = 1520;
-            drivetrain.setDesiredHeading(alignAngles[2]);
-            if(drivetrain.getFieldHeading() < alignAngles[2] + 20 && drivetrain.getFieldHeading() > alignAngles[2] - 20) {
-                arm.launchPlane(true);
-                if(planeTimer.time() > 2){
-                    arm.launchPlane(false);
-                }
-            }else{
-                planeTimer.reset();
-            }
-        }
-
-        if(operatorController.x.wasJustPressed() || operatorController.a.wasJustPressed()){
+        boolean aIsPressed = operatorController.a.wasJustPressed();
+        if(operatorController.x.wasJustPressed() || aIsPressed){
             leftClamp = !leftClamp;
         }
-        if(operatorController.b.wasJustPressed() || operatorController.a.wasJustPressed()){
+        if(operatorController.b.wasJustPressed() || aIsPressed){
             rightClamp = !rightClamp;
         }
 
@@ -258,9 +247,7 @@ public class Robot implements DriveConstants, ArmConstants {
     }
 
     private void signalLights() {
-        if(!hasSeenAprilTag)
-            lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
-        else if(splineToIntake)
+        if(splineToIntake)
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.STROBE_WHITE);
         else if(splineToScoring)
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.STROBE_GOLD);
@@ -270,10 +257,10 @@ public class Robot implements DriveConstants, ArmConstants {
 
     private void outputTelemetry() {
         telemetry.addData("imu", drivetrain.getFieldHeading());
-        telemetry.addData("loop time", loopTimer.time());
         telemetry.addData("x", drivetrain.getXY()[0]);
         telemetry.addData("y",drivetrain.getXY()[1]);
         telemetry.addData("arm", arm.getArmPosition());
+        telemetry.addData("loop time", loopTimer.time());
         loopTimer.reset();
         telemetry.update();
     }

@@ -21,6 +21,8 @@ public class ArmTeleop extends OpMode {
     public static boolean armGoToPos;
     public static boolean climb;
     public static int armDesiredPosition;
+    public static boolean wristGoToPos;
+    public static double wristDesiredPos;
     public static double wristPower;
     public static boolean launchPlane;
     public static boolean isFloat;
@@ -51,10 +53,15 @@ public class ArmTeleop extends OpMode {
         else
             arm.shoulderManual(shoulderPower);
 
-        arm.wristManual(wristPower);
+        if(wristGoToPos)
+            arm.wristGoToPos(wristDesiredPos);
+        else
+            arm.wristManual(wristPower);
+
         arm.launchPlane(launchPlane);
 
         telemetry.addData("arm position", arm.getArmPosition());
+        telemetry.addData("wrist position", arm.getWristPosition());
         telemetry.addData("loop time millis", loopTimer.time());
         loopTimer.reset();
 

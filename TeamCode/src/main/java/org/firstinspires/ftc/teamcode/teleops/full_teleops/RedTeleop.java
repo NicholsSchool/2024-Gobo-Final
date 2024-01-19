@@ -4,21 +4,21 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.constants.TeleopConstants;
-import org.firstinspires.ftc.teamcode.other.Robot;
+import org.firstinspires.ftc.teamcode.other.TeleopRobot;
 
 /**
  * A teleop to copy paste edit with
  */
 @TeleOp(name="Red Competition")
 public class RedTeleop extends OpMode implements TeleopConstants {
-    private Robot robot;
+    private TeleopRobot robot;
 
     /**
      * Code to run ONCE when the driver hits INIT
      */
     @Override
     public void init() {
-        robot = new Robot(hardwareMap, IS_RED_ALLIANCE, gamepad1, gamepad2, telemetry, new double[]{0.0, 0.0, 0.0});
+        robot = new TeleopRobot(hardwareMap, IS_RED_ALLIANCE, gamepad1, gamepad2, telemetry, new double[]{0.0, 0.0, 0.0});
     }
 
     /**

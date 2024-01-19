@@ -15,7 +15,7 @@ import org.firstinspires.ftc.teamcode.constants.ProfileConstants;
 import org.firstinspires.ftc.teamcode.constants.VisionConstants;
 
 /**
- * The Vision Subsystem of the Robot
+ * The Vision Subsystem of the TeleopRobot
  */
 public class Vision implements ProfileConstants, VisionConstants {
     private final AprilTagProcessor processor;
@@ -48,7 +48,7 @@ public class Vision implements ProfileConstants, VisionConstants {
     }
 
     /**
-     * Updates the Robot Vision, call in each loop
+     * Updates the TeleopRobot Vision, call in each loop
      *
      * @return the robot pose [x, y, theta] in inches and degrees
      */

@@ -45,7 +45,7 @@ public class CombineTestingAuto extends LinearOpMode {
             double power1 = 0.7 * Range.clip(1.4 - spline1.desiredT(), 0, 1);
 
             arm.armGoToPosition(700);
-            arm.wristToPosition(152);
+            arm.wristGoToPos(152);
 
             hand.leftGrabber(true);
             hand.rightGrabber(true);
@@ -69,7 +69,7 @@ public class CombineTestingAuto extends LinearOpMode {
         actionTime.reset();
         while(actionTime.time() < 2){
             arm.armGoToPosition(-200);
-            arm.wristToPosition(152);
+            arm.wristGoToPos(152);
 
             hand.leftGrabber(true);
             hand.rightGrabber(true);
@@ -83,7 +83,7 @@ public class CombineTestingAuto extends LinearOpMode {
             spline2.update();
             double power2 = 0.7 * Range.clip(1.4 - spline2.desiredT(), 0, 1);
 
-            arm.wristToPosition(152);
+            arm.wristGoToPos(152);
             drivetrain.setDesiredHeading(0);
             drivetrain.drive(power2 * Math.cos(spline2.angle()), power2 * Math.sin(spline2.angle()), 0, true, false);
             if(sampleTime.time() > 30) {

@@ -6,13 +6,14 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.constants.ArmConstants;
+import org.firstinspires.ftc.teamcode.constants.DriveConstants;
 import org.firstinspires.ftc.teamcode.constants.ProfileConstants;
 import org.firstinspires.ftc.teamcode.other.MotionProfile;
 
 /**
- * Robot Arm Subsystem
+ * TeleopRobot Arm Subsystem
  */
-public class Arm implements ArmConstants, ProfileConstants {
+public class Arm implements ArmConstants, ProfileConstants, DriveConstants {
     private final DcMotorEx leftShoulder;
     private final DcMotorEx rightShoulder;
     private final DcMotorEx wrist;
@@ -100,15 +101,6 @@ public class Arm implements ArmConstants, ProfileConstants {
                 SHOULDER_F * Math.cos(Math.PI * position / ARM_VERTICAL));
     }
 
-    public int getWristPosition(){
-        return wrist.getCurrentPosition();
-    }
-
-    public void wristToPosition(int desiredPosition){
-        int position = getWristPosition();
-        wristManual(SHOULDER_P * 5 * (desiredPosition - position));
-    }
-
     /**
      * Moves the wrist motor manually
      *
@@ -117,6 +109,29 @@ public class Arm implements ArmConstants, ProfileConstants {
     public void wristManual(double power) {
         wrist.setPower(Range.clip(power, -WRIST_MAX, WRIST_MAX));
     }
+
+    /**
+     * The Wrist Encoder Position
+     *
+     * @return the Core Hex Encoder Ticks
+     */
+    public int getWristPosition() {
+        return wrist.getCurrentPosition() - 5;
+    }
+
+    public void wristGoToPos(double desiredPosition) {
+        wristManual(WRIST_P * (desiredPosition - getWristPosition()));
+    }
+
+//    /**
+//     * Moves the wrist to the intaking or scoring angle automatically
+//     */
+//    public void wristFourbar(double p, double switchPos) {
+//        if(getArmPosition() <= switchPos)
+//            wristGoToPos(-5.0 -getArmPosition() * CORE_HEX_TICKS_PER_REV / (1.0 * THRU_BORE_TICKS_PER_REV), p);
+//        else
+//            wristGoToPos(48.0 - getArmPosition() * CORE_HEX_TICKS_PER_REV / (1.0 * THRU_BORE_TICKS_PER_REV), p);
+//    }
 
     /**
      * Sets the arm to Float mode

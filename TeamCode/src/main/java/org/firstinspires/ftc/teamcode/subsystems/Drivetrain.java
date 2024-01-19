@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.constants.DriveConstants;
 //TODO: tune the driving profile speed
 
 /**
- * Robot Drivetrain Subsystem
+ * TeleopRobot Drivetrain Subsystem
  */
 public class Drivetrain implements DriveConstants {
     private final boolean isBlueAlliance;
@@ -120,7 +120,7 @@ public class Drivetrain implements DriveConstants {
     }
 
     private double turnToAngle() {
-        double error = AngleMath.addAngles(heading, -desiredHeading);
+        double error = AngleMath.addAnglesDegrees(heading, -desiredHeading);
         return Math.abs(error) < AUTO_ALIGN_ERROR ? 0.0 : error * AUTO_ALIGN_P;
     }
 
@@ -133,13 +133,38 @@ public class Drivetrain implements DriveConstants {
         this.desiredHeading = desiredHeading;
     }
 
-    private double[] vectorToVertex(double wx, double wy, boolean toIntake) {
+    /**
+     * With the robot at (x, y), calculates the drive vector of the robot
+     * in order to follow a parabola and arrive at the waypoint (wx, wy)
+     * that is the parabola's vertex.
+     * The parabola is defined to contain the robot's coordinates.
+     *
+     * @param wx the waypoint x coordinate
+     * @param wy the waypoint y coordinate
+     * @param toIntake whether the robot is going to the intake
+     *
+     * @return the drive vector in [x, y] notation
+     */
+    public double[] vectorToVertex(double wx, double wy, boolean toIntake) {
         if(x == wx)
             return toIntake ? new double[]{1.0, 0.0} : new double[]{-1.0, 0.0};
         return new double[]{wx - x, (wy - y) * 2.0};
     }
 
-    private double[] vectorFromVertex(double wx, double wy, double h, boolean toIntake) {
+    /**
+     * With the robot at (x, y), calculates the drive vector of the robot
+     * in order to follow a parabola and arrive at the waypoint (wx, wy).
+     * The parabola is defined with its vertex constrained to the x-value
+     * of h (the previous waypoint), and the curve consists of both the
+     * waypoint and robot coordinates.
+     *
+     * @param wx the waypoint x coordinate
+     * @param wy the waypoint y coordinate
+     * @param h  the x value of the previous waypoint
+     * @param toIntake whether the robot is going to the intake
+     * @return the drive vector in [x, y] notation
+     */
+    public double[] vectorFromVertex(double wx, double wy, double h, boolean toIntake) {
         if(x == wx)
             return toIntake ? new double[]{1.0, 0.0} : new double[]{-1.0, 0.0};
 
@@ -150,7 +175,7 @@ public class Drivetrain implements DriveConstants {
             return y < wy ? new double[]{0.0, 1.0} : new double[]{0.0, -1.0};
 
         double k = (wy * robotDistSquared - y * waypointDistSquared) / (robotDistSquared - waypointDistSquared);
-        return x > wx ? new double[]{h - x, (k - y) * 2.0} : new double[]{x - h, (y - k) * 2.0};
+        return (x > wx) == isBlueAlliance ? new double[]{h - x, (k - y) * 2.0} : new double[]{x - h, (y - k) * 2.0};
     }
 
     /**
@@ -229,7 +254,7 @@ public class Drivetrain implements DriveConstants {
     }
 
     /**
-     * Sets the Robot Pose
+     * Sets the TeleopRobot Pose
      *
      * @param pose the x, y, theta of the robot
      */
@@ -286,6 +311,6 @@ public class Drivetrain implements DriveConstants {
      * @return the heading in degrees
      */
     public double getFieldHeading() {
-        return AngleMath.addAngles(heading, 0.0);
+        return AngleMath.addAnglesDegrees(heading, 0.0);
     }
 }

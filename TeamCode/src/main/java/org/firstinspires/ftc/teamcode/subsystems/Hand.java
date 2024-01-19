@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.constants.HandConstants;
 
 /**
- * Robot Hand Subsystem
+ * TeleopRobot Hand Subsystem
  */
 public class Hand implements HandConstants {
     private final Servo leftGrabber;

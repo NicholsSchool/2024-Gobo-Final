@@ -30,4 +30,10 @@ public interface ArmConstants {
 
     /** Arm Vertical Encoder Position */
     double ARM_VERTICAL = 2770.0;
+
+    /** Wrist Proportional Constant */
+    double WRIST_P = 0.0025;
+
+    /** Core Hex Ticks per Revolution */
+    double CORE_HEX_TICKS_PER_REV = 288;
 }
