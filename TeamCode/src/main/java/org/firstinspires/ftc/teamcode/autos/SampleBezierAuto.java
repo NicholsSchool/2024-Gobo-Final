@@ -6,12 +6,16 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.teamcode.constants.ArmConstants;
 import org.firstinspires.ftc.teamcode.constants.DriveConstants;
+import org.firstinspires.ftc.teamcode.other.PropDetector;
 import org.firstinspires.ftc.teamcode.other.Spline;
 import org.firstinspires.ftc.teamcode.subsystems.*;
 import org.firstinspires.ftc.teamcode.subsystems.Lights;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
+
+import java.util.List;
 
 /**
  * Sample Auto to Copy Paste Edit with
@@ -35,6 +39,9 @@ public class SampleBezierAuto extends LinearOpMode implements DriveConstants, Ar
         hand.rightGrabber(true);
 
         Vision vision = new Vision(hardwareMap, 36.0, -65.0);
+        PropDetector propDetector = new PropDetector(hardwareMap, true);
+        List<Recognition> recs;
+
         Lights lights = new Lights(hardwareMap, true);
         lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
 
@@ -45,6 +52,28 @@ public class SampleBezierAuto extends LinearOpMode implements DriveConstants, Ar
         Spline spline2 = new Spline(points2, 20, drivetrain, 100);
         spline1.update();
         spline2.update();
+
+        int propPosition = 1;
+
+        while(opModeInInit()){
+
+            recs = propDetector.getRecognitions();
+
+            Recognition bestRec =  propDetector.getBestRecognitions();
+
+            if(recs == null){
+                propPosition = 1;
+            } else if(bestRec.getLeft() > 18 && bestRec.getLeft() < 298){
+                propPosition = 2;
+            } else{
+                propPosition = 3;
+            }
+
+            telemetry.addData("PROP", propPosition);
+            telemetry.update();
+
+        }
+
 
         waitForStart();
 
@@ -82,6 +111,27 @@ public class SampleBezierAuto extends LinearOpMode implements DriveConstants, Ar
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SINELON_FOREST_PALETTE);
 
             }
+        }
+
+        boolean atPropHeading = false;
+        double propHeading = -90;
+
+        while(!atPropHeading){
+            switch(propPosition){
+                case 0:
+                    propHeading = 180;
+                    break;
+                case 1:
+                    propHeading = 90;
+                    break;
+                case 2:
+                    propHeading = 0;
+                    break;
+            }
+            drivetrain.setDesiredHeading(propHeading);
+
+            atPropHeading = Math.abs(drivetrain.getFieldHeading() - propHeading) < 5;
+
         }
 
         while(spline1.desiredT() < 0.97) {
