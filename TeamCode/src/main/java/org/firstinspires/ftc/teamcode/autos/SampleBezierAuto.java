@@ -7,15 +7,21 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.robotcore.internal.opmode.InstantRunHelper;
 import org.firstinspires.ftc.teamcode.constants.ArmConstants;
 import org.firstinspires.ftc.teamcode.constants.DriveConstants;
+import org.firstinspires.ftc.teamcode.other.AngleMath;
 import org.firstinspires.ftc.teamcode.other.PropDetector;
 import org.firstinspires.ftc.teamcode.other.Spline;
 import org.firstinspires.ftc.teamcode.subsystems.*;
 import org.firstinspires.ftc.teamcode.subsystems.Lights;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
 
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 /**
  * Sample Auto to Copy Paste Edit with
@@ -53,29 +59,44 @@ public class SampleBezierAuto extends LinearOpMode implements DriveConstants, Ar
         spline1.update();
         spline2.update();
 
-        int propPosition = 1;
+        Recognition bestRec;
+
+        Queue<Integer> propQueue = new PriorityQueue<Integer>();
+
+
 
         while(opModeInInit()){
 
-            recs = propDetector.getRecognitions();
+            int propPosition = 1;
 
-            Recognition bestRec =  propDetector.getBestRecognitions();
+            bestRec = propDetector.getBestRecognitions();
 
-            if(recs == null){
-                propPosition = 1;
-            } else if(bestRec.getLeft() > 18 && bestRec.getLeft() < 298){
-                propPosition = 2;
-            } else{
-                propPosition = 3;
+            if(bestRec == null){
+                continue;
+            }
+            if (bestRec.getLeft() > 18 && bestRec.getLeft() < 298) {
+                    propPosition = 2;
+            } else if (bestRec.getLeft() > 298) {
+                    propPosition = 3;
             }
 
-            telemetry.addData("PROP", propPosition);
-            telemetry.update();
+            if (propQueue.size() <= 25) {
+
+                propQueue.remove();
+
+            }
+
+            propQueue.add(propPosition);
 
         }
 
-
         waitForStart();
+
+        Integer[] propPositions = propQueue.toArray(new Integer[25]);
+
+        //int finalPos = AngleMath.mode(propPositions);
+
+        telemetry.addData("WHAT THE FUCK", Arrays.toString(propPositions));
 
         double[] scanCoords = new double[]{36.0, -40.0};
         double distance = SPLINE_ERROR;
@@ -117,14 +138,14 @@ public class SampleBezierAuto extends LinearOpMode implements DriveConstants, Ar
         double propHeading = -90;
 
         while(!atPropHeading){
-            switch(propPosition){
-                case 0:
+            switch(finalPos){
+                case 1:
                     propHeading = 180;
                     break;
-                case 1:
+                case 2:
                     propHeading = 90;
                     break;
-                case 2:
+                case 3:
                     propHeading = 0;
                     break;
             }

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.other;
 
+import java.util.Arrays;
+
 /**
  * Methods for doing math with Angles
  */
@@ -39,4 +41,40 @@ public class AngleMath {
 
         return sum;
     }
+
+    public static int mode(Integer[] n)
+    {
+        Arrays.sort(n);
+
+        int count2 = 0;
+        int count1 = 0;
+        int popular1 = 0;
+        int popular2 = 0;
+
+
+        for (int i = 0; i < n.length; i++)
+        {
+            popular1 = n[i];
+            count1 = 1;
+
+            for (int j = i + 1; j < n.length; j++)
+            {
+                if (popular1 == n[j]) count1++;
+            }
+
+            if (count1 > count2)
+            {
+                popular2 = popular1;
+                count2 = count1;
+            }
+
+            else if(count1 == count2)
+            {
+                popular2 = Math.min(popular2, popular1);
+            }
+        }
+
+        return popular2;
+    }
+
 }
