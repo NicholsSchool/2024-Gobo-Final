@@ -175,7 +175,7 @@ public class Drivetrain implements DriveConstants {
             return y < wy ? new double[]{0.0, 1.0} : new double[]{0.0, -1.0};
 
         double k = (wy * robotDistSquared - y * waypointDistSquared) / (robotDistSquared - waypointDistSquared);
-        return (x > wx) == isBlueAlliance ? new double[]{h - x, (k - y) * 2.0} : new double[]{x - h, (y - k) * 2.0};
+        return (x > wx) == toIntake ? new double[]{h - x, (k - y) * 2.0} : new double[]{x - h, (y - k) * 2.0};
     }
 
     /**

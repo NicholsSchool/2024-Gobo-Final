@@ -7,10 +7,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
-import org.firstinspires.ftc.robotcore.internal.opmode.InstantRunHelper;
 import org.firstinspires.ftc.teamcode.constants.ArmConstants;
 import org.firstinspires.ftc.teamcode.constants.DriveConstants;
-import org.firstinspires.ftc.teamcode.other.AngleMath;
 import org.firstinspires.ftc.teamcode.other.PropDetector;
 import org.firstinspires.ftc.teamcode.other.Spline;
 import org.firstinspires.ftc.teamcode.subsystems.*;
@@ -18,7 +16,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Lights;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
@@ -45,14 +42,17 @@ public class SampleBezierAuto extends LinearOpMode implements DriveConstants, Ar
         hand.rightGrabber(true);
 
         Vision vision = new Vision(hardwareMap, 36.0, -65.0);
-        PropDetector propDetector = new PropDetector(hardwareMap, true);
+
+        PropDetector propDetector = new PropDetector(hardwareMap);
         List<Recognition> recs;
 
-        Lights lights = new Lights(hardwareMap, true);
+        Lights lights = new Lights(hardwareMap, false);
         lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
 
-        double[][] points1 = new double[][]{{36, -65}, {72.4, 25.3}, {-29.8, 1.3}, {-40, -36.2}};
-        double[][] points2 = new double[][]{{-38, -58}, {85.3, -2.6}, {0.7, 25.7}, {-21.8, -6.5}};
+
+        //points 1 is red points 2 is blue
+        double[][] points1 = new double[][]{{36, 36.5}, {79.5, -24.6}, {-32.3, 1.5}, {-53.2, 9.7}};
+        double[][] points2 = new double[][]{{36, -36.5}, {79.5, 24.6}, {-32.3, -1.5}, {-53.2, -9.7}};
 
         Spline spline1 = new Spline(points1, 20, drivetrain, 100);
         Spline spline2 = new Spline(points2, 20, drivetrain, 100);
@@ -63,30 +63,11 @@ public class SampleBezierAuto extends LinearOpMode implements DriveConstants, Ar
 
         Queue<Integer> propQueue = new PriorityQueue<Integer>();
 
+        telemetry.addData("before while", 0);
 
+        int propPosition = 1;
 
-        while(opModeInInit()){
-
-            int propPosition = 1;
-
-            bestRec = propDetector.getBestRecognitions();
-
-            if(bestRec == null){
-                continue;
-            }
-            if (bestRec.getLeft() > 18 && bestRec.getLeft() < 298) {
-                    propPosition = 2;
-            } else if (bestRec.getLeft() > 298) {
-                    propPosition = 3;
-            }
-
-            if (propQueue.size() <= 25) {
-
-                propQueue.remove();
-
-            }
-
-            propQueue.add(propPosition);
+        while(opModeInInit()) {
 
         }
 
@@ -96,9 +77,9 @@ public class SampleBezierAuto extends LinearOpMode implements DriveConstants, Ar
 
         //int finalPos = AngleMath.mode(propPositions);
 
-        telemetry.addData("WHAT THE FUCK", Arrays.toString(propPositions));
+        telemetry.addData("Prop Pos", Arrays.toString(propPositions));
 
-        double[] scanCoords = new double[]{36.0, -40.0};
+        double[] scanCoords = new double[]{34.0, -38.0};
         double distance = SPLINE_ERROR;
 
         drivetrain.setDesiredHeading(0.0);
@@ -116,14 +97,15 @@ public class SampleBezierAuto extends LinearOpMode implements DriveConstants, Ar
         }
 
         drivetrain.drive(0, 0, 0, false, false);
+
         waitTime.reset();
-        while (waitTime.time() < 1) {
+        while (waitTime.time() < 1.0) {
         }
 
         boolean hasSeenAprilTag = false;
         ElapsedTime visionTimer = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
 
-        while (!hasSeenAprilTag && visionTimer.time() <= 1.0) {
+        while (!hasSeenAprilTag && visionTimer.time() <= 2.0) {
             double[] visionPose = vision.update();
             if (visionPose != null) {
                 drivetrain.setPose(visionPose);
@@ -134,25 +116,8 @@ public class SampleBezierAuto extends LinearOpMode implements DriveConstants, Ar
             }
         }
 
-        boolean atPropHeading = false;
-        double propHeading = -90;
-
-        while(!atPropHeading){
-            switch(finalPos){
-                case 1:
-                    propHeading = 180;
-                    break;
-                case 2:
-                    propHeading = 90;
-                    break;
-                case 3:
-                    propHeading = 0;
-                    break;
-            }
-            drivetrain.setDesiredHeading(propHeading);
-
-            atPropHeading = Math.abs(drivetrain.getFieldHeading() - propHeading) < 5;
-
+        waitTime.reset();
+        while (waitTime.time() < 1.0) {
         }
 
         while(spline1.desiredT() < 0.97) {
