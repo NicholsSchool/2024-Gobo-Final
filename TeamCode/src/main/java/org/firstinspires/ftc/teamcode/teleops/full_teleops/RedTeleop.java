@@ -18,7 +18,7 @@ public class RedTeleop extends OpMode implements TeleopConstants {
      */
     @Override
     public void init() {
-        robot = new TeleopRobot(hardwareMap, IS_RED_ALLIANCE, gamepad1, gamepad2, telemetry, new double[]{0.0, 0.0, 0.0});
+        robot = new TeleopRobot(hardwareMap, IS_RED_ALLIANCE, gamepad1, gamepad2, telemetry, new double[]{0.0, 0.0, -180.0});
     }
 
     /**

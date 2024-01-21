@@ -50,7 +50,7 @@ public class RedAuto extends LinearOpMode implements DriveConstants, ArmConstant
         lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.GRAY);
 
 
-        double[][] points1 = new double[][]{{34.0, 38.0}, {55.2, 64.7}, {87.5, -51.0}, {-49.7, 10.6}};
+        double[][] points1 = new double[][]{{34.0, 38.8}, {55.2, 64.7}, {88.8, -53.6}, {-58.3, 11.5}};
 
         Spline spline1 = new Spline(points1, 20, drivetrain, 100);
         spline1.update();
@@ -89,7 +89,7 @@ public class RedAuto extends LinearOpMode implements DriveConstants, ArmConstant
         }
         else {
             propZone = PropZones.LEFT;
-            purplePixelAngle = -45.0;
+            purplePixelAngle = -30.0;
         }
 
         double[] scanCoords = new double[]{36.0, 38.0};
@@ -179,7 +179,7 @@ public class RedAuto extends LinearOpMode implements DriveConstants, ArmConstant
 
         hand.rightGrabber(true);
 
-        while(spline1.desiredT() < 0.98) {
+        while(spline1.desiredT() < 0.99) {
             spline1.update();
             double[] robotPose = drivetrain.getXY();
 
@@ -198,11 +198,11 @@ public class RedAuto extends LinearOpMode implements DriveConstants, ArmConstant
 
             double turn = 0;
             boolean autoAlign = true;
-            
+
             double desiredT = spline1.desiredT();
 
             lowGear = desiredT < 0.6 || desiredT > 0.9;
-            if(desiredT > 0.75)
+            if(desiredT > 0.8)
                 drivetrain.setDesiredHeading(-180.0);
             else
                 drivetrain.setDesiredHeading(0.0);

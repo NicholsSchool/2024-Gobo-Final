@@ -23,5 +23,5 @@ public interface ProfileConstants {
     double FIELD_MAX_SPEED = 60.0;
 
     /** Climbing Profile Max Speed */
-    double CLIMB_MAX_SPEED = 0.5;
+    double CLIMB_MAX_SPEED = 0.1;
 }

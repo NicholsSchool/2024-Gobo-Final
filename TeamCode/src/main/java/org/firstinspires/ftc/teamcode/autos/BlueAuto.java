@@ -50,7 +50,7 @@ public class BlueAuto extends LinearOpMode implements DriveConstants, ArmConstan
         lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.GRAY);
 
 
-        double[][] points1 = new double[][]{{34.0, -38.0}, {55.2, -64.7}, {87.5, 51.0}, {-49.7, -10.6}};
+        double[][] points1 = new double[][]{{34.0, -38.8}, {55.2, -64.7}, {88.8, 53.6}, {-58.3, -11.5}};
 
         Spline spline1 = new Spline(points1, 20, drivetrain, 100);
         spline1.update();
@@ -81,18 +81,18 @@ public class BlueAuto extends LinearOpMode implements DriveConstants, ArmConstan
             int point = (int) ((bestRec.getLeft() + bestRec.getRight()) / 2.0);
             if (point < 450.0) {
                 propZone = PropZones.CENTER;
-                purplePixelAngle = 105.0;
+                purplePixelAngle = 75.0;
             } else {
                 propZone = PropZones.RIGHT;
-                purplePixelAngle = 15.0;
+                purplePixelAngle = 30.0;
             }
         }
         else {
             propZone = PropZones.LEFT;
-            purplePixelAngle = 135.0;
+            purplePixelAngle = -165.0;
         }
 
-        double[] scanCoords = new double[]{34.0, -38.0};
+        double[] scanCoords = new double[]{38.0, -38.0};
         double distance = SPLINE_ERROR;
 
         drivetrain.setDesiredHeading(0.0);
@@ -128,7 +128,7 @@ public class BlueAuto extends LinearOpMode implements DriveConstants, ArmConstan
         }
 
         waitTime.reset();
-        while (waitTime.time() < 1.0) {
+        while (waitTime.time() < 0.25) {
             drivetrain.update();
         }
 
@@ -143,7 +143,7 @@ public class BlueAuto extends LinearOpMode implements DriveConstants, ArmConstan
         drivetrain.drive(0, 0, 0, false, false);
 
         waitTime.reset();
-        while (waitTime.time() < 1.0) {
+        while (waitTime.time() < 0.25) {
             drivetrain.update();
         }
 
@@ -154,13 +154,13 @@ public class BlueAuto extends LinearOpMode implements DriveConstants, ArmConstan
         }
 
         waitTime.reset();
-        while(waitTime.time() < 3.0) {
+        while(waitTime.time() < 2.0) {
             drivetrain.update();
             arm.wristGoToPos(-WRIST_AUTO_POSITION);
         }
 
         waitTime.reset();
-        while(waitTime.time() < 2.0) {
+        while(waitTime.time() < 1.0) {
             drivetrain.update();
             arm.armGoToPosition(-ARM_STARTING_POS);
         }
@@ -179,7 +179,7 @@ public class BlueAuto extends LinearOpMode implements DriveConstants, ArmConstan
 
         hand.rightGrabber(true);
 
-        while(spline1.desiredT() < 0.98) {
+        while(spline1.desiredT() < 0.99) {
             spline1.update();
             double[] robotPose = drivetrain.getXY();
 
@@ -199,8 +199,13 @@ public class BlueAuto extends LinearOpMode implements DriveConstants, ArmConstan
             double turn = 0;
             boolean autoAlign = true;
 
-            lowGear = spline1.desiredT() < 0.6;
-            drivetrain.setDesiredHeading(0.0);
+            double desiredT = spline1.desiredT();
+
+            lowGear = desiredT < 0.6 || desiredT > 0.9;
+            if(desiredT > 0.8)
+                drivetrain.setDesiredHeading(-180.0);
+            else
+                drivetrain.setDesiredHeading(0.0);
 
             drivetrain.drive(power1 * Math.cos(spline1.angle()), power1 * Math.sin(spline1.angle()), turn, autoAlign, lowGear);
             if (sampleTime.time() > 30) {
@@ -215,6 +220,7 @@ public class BlueAuto extends LinearOpMode implements DriveConstants, ArmConstan
             telemetry.update();
         }
         drivetrain.drive(0, 0, 0, false, false);
+        hand.leftGrabber(false);
         terminateOpModeNow();
     }
 }

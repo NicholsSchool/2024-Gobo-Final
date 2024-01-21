@@ -22,3 +22,5 @@ Re-tune Odometry correction
 tune the drive motors ff
 ControllerTeleop - color, rotate, and scale the grid. Center the square
 Add Motion Profile for April Tag Heading
+Auto through center is a bad idea for next comp
+Spline through Opposite truss for teleop for next comp
