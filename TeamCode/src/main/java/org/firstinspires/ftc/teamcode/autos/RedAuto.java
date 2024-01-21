@@ -9,77 +9,90 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.teamcode.constants.ArmConstants;
 import org.firstinspires.ftc.teamcode.constants.DriveConstants;
+import org.firstinspires.ftc.teamcode.constants.TeleopConstants;
 import org.firstinspires.ftc.teamcode.other.PropDetector;
 import org.firstinspires.ftc.teamcode.other.Spline;
 import org.firstinspires.ftc.teamcode.subsystems.*;
 import org.firstinspires.ftc.teamcode.subsystems.Lights;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.PriorityQueue;
-import java.util.Queue;
 
 /**
  * Sample Auto to Copy Paste Edit with
  */
-@Autonomous(name = "Bezier Auto version 1")
-public class SampleBezierAuto extends LinearOpMode implements DriveConstants, ArmConstants {
+@Autonomous(name = "Red Auto")
+public class RedAuto extends LinearOpMode implements DriveConstants, ArmConstants, TeleopConstants {
+    enum PropZones {
+        LEFT,
+        CENTER,
+        RIGHT
+    }
 
     /**
      * Runs the Auto routine
      */
     @Override
     public void runOpMode() {
-        ElapsedTime sampleTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
         ElapsedTime waitTime = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
 
-        Drivetrain drivetrain = new Drivetrain(hardwareMap, true, 36, -65, 90.0);
+        ElapsedTime sampleTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+
+        Drivetrain drivetrain = new Drivetrain(hardwareMap, IS_BLUE_ALLIANCE, 36, 65, -90.0);
         Arm arm = new Arm(hardwareMap);
         Hand hand = new Hand(hardwareMap);
-
         hand.leftGrabber(true);
         hand.rightGrabber(true);
-
-        Vision vision = new Vision(hardwareMap, 36.0, -65.0);
-
         PropDetector propDetector = new PropDetector(hardwareMap);
         List<Recognition> recs;
 
         Lights lights = new Lights(hardwareMap, false);
-        lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
+        lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.GRAY);
 
 
-        //points 1 is red points 2 is blue
-        double[][] points1 = new double[][]{{36, 36.5}, {79.5, -24.6}, {-32.3, 1.5}, {-53.2, 9.7}};
-        double[][] points2 = new double[][]{{36, -36.5}, {79.5, 24.6}, {-32.3, -1.5}, {-53.2, -9.7}};
+        double[][] points1 = new double[][]{{34.0, 38.0}, {55.2, 64.7}, {87.5, -51.0}, {-49.7, 10.6}};
 
         Spline spline1 = new Spline(points1, 20, drivetrain, 100);
-        Spline spline2 = new Spline(points2, 20, drivetrain, 100);
         spline1.update();
-        spline2.update();
 
-        Recognition bestRec;
-
-        Queue<Integer> propQueue = new PriorityQueue<Integer>();
-
-        telemetry.addData("before while", 0);
-
+        Recognition bestRec = null;
         int propPosition = 1;
 
         while(opModeInInit()) {
-
+            bestRec = propDetector.getARandomRecognition();
+            telemetry.addData("best rec", bestRec == null ? "" : bestRec);
+            telemetry.addData("number", bestRec == null ? "" : (bestRec.getLeft() + bestRec.getRight()) * 0.5);
+            telemetry.update();
         }
+
 
         waitForStart();
 
-        Integer[] propPositions = propQueue.toArray(new Integer[25]);
 
-        //int finalPos = AngleMath.mode(propPositions);
+        propDetector.stopDetecting();
+        Vision vision = new Vision(hardwareMap, 36.0, 65.0);
 
-        telemetry.addData("Prop Pos", Arrays.toString(propPositions));
 
-        double[] scanCoords = new double[]{34.0, -38.0};
+        double purplePixelAngle;
+
+        PropZones propZone;
+
+        if(bestRec != null) {
+            int point = (int) ((bestRec.getLeft() + bestRec.getRight()) / 2.0);
+            if (point < 450.0) {
+                propZone = PropZones.CENTER;
+                purplePixelAngle = -75.0;
+            } else {
+                propZone = PropZones.RIGHT;
+                purplePixelAngle = -165.0;
+            }
+        }
+        else {
+            propZone = PropZones.LEFT;
+            purplePixelAngle = -45.0;
+        }
+
+        double[] scanCoords = new double[]{36.0, 38.0};
         double distance = SPLINE_ERROR;
 
         drivetrain.setDesiredHeading(0.0);
@@ -95,11 +108,11 @@ public class SampleBezierAuto extends LinearOpMode implements DriveConstants, Ar
 
             drivetrain.drive(xyInput[0] * powerRatio, xyInput[1] * powerRatio, 0.0, true, true);
         }
-
         drivetrain.drive(0, 0, 0, false, false);
 
         waitTime.reset();
         while (waitTime.time() < 1.0) {
+            drivetrain.update();
         }
 
         boolean hasSeenAprilTag = false;
@@ -110,29 +123,74 @@ public class SampleBezierAuto extends LinearOpMode implements DriveConstants, Ar
             if (visionPose != null) {
                 drivetrain.setPose(visionPose);
                 hasSeenAprilTag = true;
-
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SINELON_FOREST_PALETTE);
-
             }
         }
 
         waitTime.reset();
-        while (waitTime.time() < 1.0) {
+        while (waitTime.time() < 0.25) {
+            drivetrain.update();
         }
 
-        while(spline1.desiredT() < 0.97) {
+        drivetrain.setDesiredHeading(purplePixelAngle);
+        double error = AUTO_ALIGN_ERROR;
+        while (error >= AUTO_ALIGN_ERROR) {
+            drivetrain.update();
+            double angle = drivetrain.getFieldHeading();
+            drivetrain.drive(0.0, 0.0, 0.0, true, true);
+            error = Math.abs(angle - purplePixelAngle);
+        }
+        drivetrain.drive(0, 0, 0, false, false);
+
+        waitTime.reset();
+        while (waitTime.time() < 0.25) {
+            drivetrain.update();
+        }
+
+        waitTime.reset();
+        while(waitTime.time() < 2.0) {
+            drivetrain.update();
+            arm.armGoToPosition(1700.0 - ARM_STARTING_POS);
+        }
+
+        waitTime.reset();
+        while(waitTime.time() < 2.0) {
+            drivetrain.update();
+            arm.wristGoToPos(-WRIST_AUTO_POSITION);
+        }
+
+        waitTime.reset();
+        while(waitTime.time() < 1.0) {
+            drivetrain.update();
+            arm.armGoToPosition(-ARM_STARTING_POS);
+        }
+
+        waitTime.reset();
+        while(waitTime.time() < 1.0) {
+            drivetrain.update();
+            hand.rightGrabber(false);
+        }
+
+        waitTime.reset();
+        while(waitTime.time() < 2.0) {
+            drivetrain.update();
+            arm.wristGoToPos(60.0 - WRIST_AUTO_POSITION);
+        }
+
+        hand.rightGrabber(true);
+
+        while(spline1.desiredT() < 0.98) {
             spline1.update();
-            spline2.update();
             double[] robotPose = drivetrain.getXY();
 
             hand.leftGrabber(true);
             hand.rightGrabber(true);
 
-            double error = Math.hypot(robotPose[0] - points1[3][0], robotPose[1] - points1[3][1]);
+            double jamesSplineError = Math.hypot(robotPose[0] - points1[3][0], robotPose[1] - points1[3][1]);
             double power1 = 0.0;
-            if(error > 2 * SPLINE_ERROR)
+            if(jamesSplineError > 2 * SPLINE_ERROR)
                 power1 = Range.clip(
-                    SPLINE_P * Math.hypot(robotPose[0] - points1[3][0], robotPose[1] - points1[3][1]), 0.0, 1.0);
+                        SPLINE_P * Math.hypot(robotPose[0] - points1[3][0], robotPose[1] - points1[3][1]), 0.0, 1.0);
             else
                 break;
 
@@ -140,15 +198,14 @@ public class SampleBezierAuto extends LinearOpMode implements DriveConstants, Ar
 
             double turn = 0;
             boolean autoAlign = true;
-            if (spline1.desiredT() > 0.6) {
-                lowGear = true;
-                drivetrain.setDesiredHeading(-180);
-                arm.armGoToPosition(1220);
+            
+            double desiredT = spline1.desiredT();
 
-            }else{
-                lowGear = false;
-            }
-
+            lowGear = desiredT < 0.6 || desiredT > 0.9;
+            if(desiredT > 0.75)
+                drivetrain.setDesiredHeading(-180.0);
+            else
+                drivetrain.setDesiredHeading(0.0);
 
             drivetrain.drive(power1 * Math.cos(spline1.angle()), power1 * Math.sin(spline1.angle()), turn, autoAlign, lowGear);
             if (sampleTime.time() > 30) {
@@ -160,42 +217,10 @@ public class SampleBezierAuto extends LinearOpMode implements DriveConstants, Ar
             telemetry.addData("t", spline1.desiredT());
             telemetry.addData("bezierX", spline1.bezierX(spline1.desiredT()));
             telemetry.addData("bezierY", spline1.bezierY(spline1.desiredT()));
-            telemetry.addData("t2", (spline2.desiredT()));
             telemetry.update();
         }
-
-        waitTime.reset();
-        while (waitTime.time() < 1) {
-            arm.armGoToPosition(1220);
-
-            drivetrain.drive(0, 0, 0, false, false);
-
-            hand.leftGrabber(true);
-            hand.rightGrabber(true);
-        }
-
-        hasSeenAprilTag = false;
-        visionTimer.reset();
-
-        while (!hasSeenAprilTag && visionTimer.time() <= 1.0) {
-            arm.armGoToPosition(1220);
-
-            double[] visionPose = vision.update();
-            if (visionPose != null) {
-                drivetrain.setPose(visionPose);
-                hasSeenAprilTag = true;
-
-                lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
-
-                arm.armGoToPosition(1220);
-
-            }
-        }
-
-        visionTimer.reset();
-        while(visionTimer.time() < 2){
-
-
-        }
+        drivetrain.drive(0, 0, 0, false, false);
+        hand.leftGrabber(false);
+        terminateOpModeNow();
     }
 }

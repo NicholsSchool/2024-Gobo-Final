@@ -15,5 +15,6 @@ public class SampleAuto extends LinearOpMode {
     public void runOpMode() {
         waitForStart();
         runtime.reset();
+        terminateOpModeNow();
     }
 }

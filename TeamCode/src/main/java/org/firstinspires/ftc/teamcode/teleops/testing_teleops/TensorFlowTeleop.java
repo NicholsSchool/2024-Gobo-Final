@@ -16,7 +16,7 @@ public class TensorFlowTeleop extends OpMode {
     }
 
     public void loop() {
-        Recognition bestRec = pd.getBestRecognitions();
+        Recognition bestRec = pd.getARandomRecognition();
 
         if (bestRec == null)
             telemetry.addData("no recognitions", "");
