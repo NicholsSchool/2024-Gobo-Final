@@ -5,7 +5,7 @@ import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver.BlinkinPattern;
 
 /**
- * TeleopRobot Indicator Lights Subsystem
+ * Robot Indicator Lights Subsystem
  * A full list of REV Blinkin patterns can be found
  * <a href="https://first-tech-challenge.github.io/SkyStone/com/qualcomm/hardware/rev/RevBlinkinLedDriver.BlinkinPattern.html">here</a>.
  */
@@ -25,10 +25,11 @@ public class Lights {
         rightBlinkin = hwMap.get(RevBlinkinLedDriver.class, "rightBlinkin");
 
         defaultPattern = isBlueAlliance ? BlinkinPattern.BLUE : BlinkinPattern.RED;
-        setPattern(BlinkinPattern.GREEN);
+        setAllianceColor();
     }
 
-    /** Sets both left and right LED strips to a certain color pattern.
+    /**
+     * Sets both left and right LED strips to a certain color pattern.
      *
      * @param pattern The BlinkinPattern to set the LEDs to
      */
@@ -38,9 +39,9 @@ public class Lights {
     }
 
     /**
-     * Sets the default color based on alliance
+     * Sets the lights to Alliance Colors
      */
-    public void setDefaultPattern() {
+    public void setAllianceColor() {
         leftBlinkin.setPattern(defaultPattern);
         rightBlinkin.setPattern(defaultPattern);
     }

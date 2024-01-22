@@ -38,7 +38,7 @@ public class LightsTeleop extends OpMode {
     @Override
     public void loop() {
         if(isDefault)
-            lights.setDefaultPattern();
+            lights.setAllianceColor();
         else {
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.STROBE_GOLD);
         }

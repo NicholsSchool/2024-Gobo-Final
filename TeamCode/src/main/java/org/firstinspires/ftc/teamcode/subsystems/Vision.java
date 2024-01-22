@@ -7,33 +7,28 @@ import java.util.ArrayList;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.other.CoordinateMotionProfile;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
-import org.firstinspires.ftc.teamcode.constants.ProfileConstants;
 import org.firstinspires.ftc.teamcode.constants.VisionConstants;
 
 /**
- * The Vision Subsystem of the TeleopRobot
+ * The April Tags Vision Subsystem of the Robot
  */
-public class Vision implements ProfileConstants, VisionConstants {
+public class Vision implements VisionConstants {
     private final AprilTagProcessor processor;
-    private ArrayList<AprilTagDetection> detections;
-    private final CoordinateMotionProfile smoothing;
+
     private double weightsSum;
-    private int size;
+    private int detectionsSize;
 
     /**
      * Instantiates the Vision Subsystem
      *
      * @param hwMap the hardware map
-     * @param initialX the starting X
-     * @param initialY the starting Y
      */
-    public Vision(HardwareMap hwMap, double initialX, double initialY) {
+    public Vision(HardwareMap hwMap) {
         processor = new AprilTagProcessor.Builder()
-                .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
+                .setOutputUnits(DistanceUnit.INCH, AngleUnit.RADIANS)
                 .build();
 
         VisionPortal portal = new VisionPortal.Builder()
@@ -41,29 +36,26 @@ public class Vision implements ProfileConstants, VisionConstants {
                 .setStreamFormat(VisionPortal.StreamFormat.YUY2)
                 .addProcessor(processor)
                 .build();
-
-        detections = new ArrayList<>();
-
-        smoothing = new CoordinateMotionProfile(initialX, initialY, -FIELD_MAX, FIELD_MAX, FIELD_MAX_SPEED);
     }
 
     /**
-     * Updates the TeleopRobot Vision, call in each loop
+     * Attempts to Update the Robot Pose using April Tags
      *
-     * @return the robot pose [x, y, theta] in inches and degrees
+     * @return the robot pose [x, y, theta] in inches and radians
      */
     public double[] update() {
-        detections = processor.getDetections();
+        ArrayList<AprilTagDetection> detections = processor.getDetections();
         weightsSum = 0;
 
         double[] poseSum = new double[4];
 
-        size = detections.size();
+        detectionsSize = detections.size();
 
-        for(int i = 0; i < size; i++) {
-            double[] currentPose = addWeights(localize(i));
+        for(AprilTagDetection detection : detections) {
+            double[] currentPose = addWeights(localize(detection));
+
             if(currentPose == null)
-                size--;
+                detectionsSize--;
             else {
                 poseSum[0] += currentPose[0];
                 poseSum[1] += currentPose[1];
@@ -72,16 +64,13 @@ public class Vision implements ProfileConstants, VisionConstants {
             }
         }
 
-        if(size == 0)
+        if(detectionsSize == 0)
             return null;
 
-        double[] smoothedXY = smoothing.update(poseSum[0] / weightsSum, poseSum[1] / weightsSum);
-        return new double[]{smoothedXY[0], smoothedXY[1], Math.toDegrees(Math.atan2(poseSum[3],poseSum[2]))};
+        return new double[]{poseSum[0] / weightsSum, poseSum[1] / weightsSum, Math.atan2(poseSum[3],poseSum[2])};
     }
 
-    private double[] localize(int i) {
-        AprilTagDetection aprilTagDetection = detections.get(i);
-
+    private double[] localize(AprilTagDetection aprilTagDetection) {
         if(aprilTagDetection.metadata == null)
             return null;
 
@@ -92,26 +81,23 @@ public class Vision implements ProfileConstants, VisionConstants {
         double yaw = aprilTagDetection.ftcPose.yaw;
         double bearing = aprilTagDetection.ftcPose.bearing;
 
-        double cameraDeltaX = range * Math.cos(Math.toRadians(bearing - yaw));
-        double cameraDeltaY = range * Math.sin(Math.toRadians(bearing - yaw));
+        double cameraDeltaX = range * Math.cos(bearing - yaw);
+        double cameraDeltaY = range * Math.sin(bearing - yaw);
 
         double cameraX = isScoringTag ? cameraDeltaX - 60.25 : 70.25 - cameraDeltaX;
-        double cameraY =
-                isScoringTag ? getTagYCoordinate(id) + cameraDeltaY : getTagYCoordinate(id) - cameraDeltaY;
+        double cameraY = isScoringTag ? getTagY(id) + cameraDeltaY : getTagY(id) - cameraDeltaY;
+        double fieldHeading = isScoringTag ? -yaw - Math.PI : -yaw;
 
-        double fieldHeadingInRadians =
-                Math.toRadians(isScoringTag ? -yaw - 180.0 : -yaw);
+        double localizedX = cameraX - HORIZONTAL_DIST * Math.sin(fieldHeading)
+                - FORWARD_DIST * Math.cos(fieldHeading);
 
-        double localizedX = cameraX - HORIZONTAL_DIST * Math.sin(fieldHeadingInRadians)
-                - FORWARD_DIST * Math.cos(fieldHeadingInRadians);
+        double localizedY = cameraY - FORWARD_DIST * Math.sin(fieldHeading)
+                + HORIZONTAL_DIST * Math.cos(fieldHeading);
 
-        double localizedY = cameraY - FORWARD_DIST * Math.sin(fieldHeadingInRadians)
-                + HORIZONTAL_DIST * Math.cos(fieldHeadingInRadians);
-
-        return new double[]{localizedX, localizedY, fieldHeadingInRadians, range, id};
+        return new double[]{localizedX, localizedY, fieldHeading, range, id};
     }
 
-    private double getTagYCoordinate(int id) {
+    private double getTagY(int id) {
         switch(id) {
             case 1:
                 return -41.41;
@@ -159,6 +145,6 @@ public class Vision implements ProfileConstants, VisionConstants {
      * @return the number of useful detections
      */
     public int getNumDetections() {
-        return size;
+        return detectionsSize;
     }
 }

@@ -35,13 +35,13 @@ public interface DriveConstants {
     double RIGHT_WAYPOINT_X = 38.0;
 
     /** Left Drive Wheel Angle Offset */
-    double LEFT_DRIVE_OFFSET = 30.0;
+    double LEFT_DRIVE_OFFSET = Math.PI / 6.0;
 
     /** Right Drive Wheel Angle Offset */
-    double RIGHT_DRIVE_OFFSET = 150.0;
+    double RIGHT_DRIVE_OFFSET = 5.0 * Math.PI / 6.0;
 
     /** Back Drive Wheel Angle Offset */
-    double BACK_DRIVE_OFFSET = 270.0;
+    double BACK_DRIVE_OFFSET = 3.0 * Math.PI / 2.0;
 
     /** Low Gear Max Speed */
     double LOW_GEAR = 0.375;

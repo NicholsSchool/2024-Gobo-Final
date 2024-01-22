@@ -99,7 +99,7 @@ public class DrivetrainTeleop extends OpMode implements TeleopConstants, DriveCo
             drivetrain.splineToScoring(turn, autoAlign, splineScoringY, lowGear);
         }
         else {
-            lights.setDefaultPattern();
+            lights.setAllianceColor();
             drivetrain.drive(x, y, turn, autoAlign, lowGear);
         }
 

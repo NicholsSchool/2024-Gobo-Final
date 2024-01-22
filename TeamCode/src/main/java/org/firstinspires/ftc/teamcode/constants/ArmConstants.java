@@ -36,6 +36,22 @@ public interface ArmConstants {
 
     /** Core Hex Ticks per Revolution */
     double CORE_HEX_TICKS_PER_REV = 288;
+
     /** Wrist Encoder Offset For Start Of Auto*/
     double WRIST_AUTO_POSITION = -192;
+
+    /**
+     * Wrist down virtual fourbar position
+     */
+    double WRIST_DOWN = 5.0;
+
+    /**
+     * Wrist up virtual fourbar position
+     */
+    double WRIST_UP = 48.0;
+
+    /**
+     * Arm position to switch the wrist virtual fourbar position
+     */
+    double WRIST_SWITCHING_POS = 300;
 }

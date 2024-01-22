@@ -10,13 +10,8 @@ import org.firstinspires.ftc.teamcode.other.CoordinateMotionProfile;
 import org.firstinspires.ftc.teamcode.other.MotionProfile;
 import org.firstinspires.ftc.teamcode.constants.DriveConstants;
 
-//TODO: tune spline p
-//TODO: tune spline error
-//TODO: edit all spline waypoints
-//TODO: tune the driving profile speed
-
 /**
- * TeleopRobot Drivetrain Subsystem
+ * Robot Drivetrain Subsystem
  */
 public class Drivetrain implements DriveConstants {
     private final boolean isBlueAlliance;
@@ -34,7 +29,7 @@ public class Drivetrain implements DriveConstants {
      * @param isBlueAlliance true for blue, false for red
      * @param x the initial x coordinate
      * @param y the initial y coordinate
-     * @param initialHeading the initial value for the robot heading
+     * @param initialHeading the initial robot heading in Radians
      */
     public Drivetrain(HardwareMap hwMap, boolean isBlueAlliance, double x, double y, double initialHeading) {
         this.isBlueAlliance = isBlueAlliance;
@@ -101,18 +96,18 @@ public class Drivetrain implements DriveConstants {
     /**
      * Drives the robot field oriented
      *
-     * @param xIn the x input value
-     * @param yIn the y input value
+     * @param xInput the x input value
+     * @param yInput the y input value
      * @param turn the turning power proportion
      * @param autoAlign whether to autoAlign
      * @param lowGear whether to put the robot to virtual low gear
      */
-    public void drive(double xIn, double yIn, double turn, boolean autoAlign, boolean lowGear) {
+    public void drive(double xInput, double yInput, double turn, boolean autoAlign, boolean lowGear) {
         turn = turnProfile.update(autoAlign ? turnToAngle() : turn);
 
-        double[] xy = driveProfile.update(xIn, yIn,(lowGear ? LOW_GEAR : HIGH_GEAR) - Math.abs(turn));
+        double[] xy = driveProfile.update(xInput, yInput,(lowGear ? LOW_GEAR : HIGH_GEAR) - Math.abs(turn));
         double power = Math.hypot(xy[0], xy[1]);
-        double angle = Math.toDegrees(Math.atan2(xy[1], xy[0]));
+        double angle = Math.atan2(xy[1], xy[0]);
 
         leftDrive.setPower(turn + power * Math.cos(Math.toRadians(angle + LEFT_DRIVE_OFFSET - heading)));
         rightDrive.setPower(turn + power * Math.cos(Math.toRadians(angle + RIGHT_DRIVE_OFFSET - heading)));
@@ -120,14 +115,14 @@ public class Drivetrain implements DriveConstants {
     }
 
     private double turnToAngle() {
-        double error = AngleMath.addAnglesDegrees(heading, -desiredHeading);
+        double error = AngleMath.addAnglesRadians(heading, -desiredHeading);
         return Math.abs(error) < AUTO_ALIGN_ERROR ? 0.0 : error * AUTO_ALIGN_P;
     }
 
     /**
      * Sets the heading to auto-align to
      *
-     * @param desiredHeading the heading in degrees
+     * @param desiredHeading the heading in radians
      */
     public void setDesiredHeading(double desiredHeading) {
         this.desiredHeading = desiredHeading;
@@ -236,7 +231,7 @@ public class Drivetrain implements DriveConstants {
         double deltaY = (currentFront - previousFrontPosition) *
                 INCHES_PER_TICK * FORWARD_ODOMETRY_CORRECTION;
 
-        heading = imuOffset - navx.getYaw();
+        heading = imuOffset - getRawHeading();
 
         double headingRadians = Math.toRadians(heading);
         double prevHeadingRadians = Math.toRadians(previousHeading);
@@ -261,7 +256,7 @@ public class Drivetrain implements DriveConstants {
     public void setPose(double[] pose) {
         x = pose[0];
         y = pose[1];
-        imuOffset = pose[2] + navx.getYaw();
+        imuOffset = pose[2] + getRawHeading();
     }
 
     /**
@@ -305,12 +300,16 @@ public class Drivetrain implements DriveConstants {
         return new double[]{x, y};
     }
 
+    private double getRawHeading() {
+        return Math.toRadians(navx.getYaw());
+    }
+
     /**
      * Gets the heading of the robot on the field coordinate system
      *
      * @return the heading in degrees
      */
     public double getFieldHeading() {
-        return AngleMath.addAnglesDegrees(heading, 0.0);
+        return AngleMath.addAnglesDegrees(Math.toDegrees(heading), 0.0);
     }
 }

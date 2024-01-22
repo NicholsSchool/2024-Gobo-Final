@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.constants.ProfileConstants;
 import org.firstinspires.ftc.teamcode.other.MotionProfile;
 
 /**
- * TeleopRobot Arm Subsystem
+ * Robot Arm Subsystem
  */
 public class Arm implements ArmConstants, ProfileConstants, DriveConstants {
     private final DcMotorEx leftShoulder;
@@ -19,7 +19,10 @@ public class Arm implements ArmConstants, ProfileConstants, DriveConstants {
     private final DcMotorEx wrist;
     private final Servo planeLauncher;
     private final MotionProfile climbProfile;
-    private int encoderOffset;
+    private double armDesiredPosition;
+    private double wristDesiredPosition;
+    private int armOffset;
+    private int wristOffset;
 
     /**
      * Initializes the Arm
@@ -47,16 +50,21 @@ public class Arm implements ArmConstants, ProfileConstants, DriveConstants {
         planeLauncher.setDirection(Servo.Direction.FORWARD);
         planeLauncher.scaleRange(ArmConstants.PLANE_MIN, ArmConstants.PLANE_MAX);
 
-        climbProfile = new MotionProfile(0.0, -CLIMB_MAX, CLIMB_MAX, CLIMB_MAX_SPEED);
+        climbProfile = new MotionProfile(0.0, -CLIMB_MAX, 0.0, CLIMB_MAX_SPEED);
+    }
+
+    /**
+     * Brings the Servo back to load position
+     */
+    public void loadPlane() {
+        planeLauncher.setPosition(0.0);
     }
 
     /**
      * Launches the plane using the Servo
-     *
-     * @param isLaunching whether to go to launch or cocked position
      */
-    public void launchPlane(boolean isLaunching) {
-        planeLauncher.setPosition(isLaunching ? 1.0 : 0.0);
+    public void launchPlane() {
+        planeLauncher.setPosition(1.0);
     }
 
     /**
@@ -64,14 +72,16 @@ public class Arm implements ArmConstants, ProfileConstants, DriveConstants {
      *
      * @param power the input motor power
      */
-    public void shoulderManual(double power) {
+    public void armManual(double power) {
+        climbProfile.update(power);
+
         power = Range.clip(power, -SHOULDER_MAX, SHOULDER_MAX);
         leftShoulder.setPower(power);
         rightShoulder.setPower(power);
     }
 
     /**
-     * Shoulder input for climbing with no power governor
+     * Shoulder input for climbing
      *
      * @param power the input motor power
      */
@@ -87,18 +97,25 @@ public class Arm implements ArmConstants, ProfileConstants, DriveConstants {
      * @return the encoder position of the arm
      */
     public int getArmPosition() {
-        return leftShoulder.getCurrentPosition() - encoderOffset;
+        return leftShoulder.getCurrentPosition() - armOffset;
     }
 
     /**
      * Moves the arm to position using an external feedback loop
-     *
-     * @param desiredPosition the encoder position to go to
      */
-    public void armGoToPosition(double desiredPosition) {
+    public void armGoToPosition() {
         double position = getArmPosition();
-        shoulderManual(SHOULDER_P * (desiredPosition - position) +
+        armManual(SHOULDER_P * (armDesiredPosition - position) +
                 SHOULDER_F * Math.cos(Math.PI * position / ARM_VERTICAL));
+    }
+
+    /**
+     * Sets the arm desired position
+     *
+     * @param position the thru bore encoder position
+     */
+    public void setDesiredArmPosition(double position) {
+        armDesiredPosition = position;
     }
 
     /**
@@ -116,22 +133,35 @@ public class Arm implements ArmConstants, ProfileConstants, DriveConstants {
      * @return the Core Hex Encoder Ticks
      */
     public int getWristPosition() {
-        return wrist.getCurrentPosition() - 5;
+        return wrist.getCurrentPosition() - wristOffset;
     }
 
-    public void wristGoToPos(double desiredPosition) {
-        wristManual(WRIST_P * (desiredPosition - getWristPosition()));
+    /**
+     * Moves the wrist motor to the encoder position
+     */
+    public void wristGoToPos() {
+        wristManual(WRIST_P * (wristDesiredPosition - getWristPosition()));
     }
 
-//    /**
-//     * Moves the wrist to the intaking or scoring angle automatically
-//     */
-//    public void wristFourbar(double p, double switchPos) {
-//        if(getArmPosition() <= switchPos)
-//            wristGoToPos(-5.0 -getArmPosition() * CORE_HEX_TICKS_PER_REV / (1.0 * THRU_BORE_TICKS_PER_REV), p);
-//        else
-//            wristGoToPos(48.0 - getArmPosition() * CORE_HEX_TICKS_PER_REV / (1.0 * THRU_BORE_TICKS_PER_REV), p);
-//    }
+    /**
+     * Sets the wrist desired position
+     *
+     * @param position the thru bore encoder position
+     */
+    public void setDesiredWristPosition(double position) {
+        wristDesiredPosition = position;
+    }
+
+    /**
+     * Moves the wrist to the intaking or scoring angle automatically
+     */
+    public void wristFourbar() {
+        if(getArmPosition() <= WRIST_SWITCHING_POS)
+            setDesiredWristPosition(WRIST_DOWN - getArmPosition());
+        else
+            setDesiredWristPosition(WRIST_UP - getArmPosition());
+        wristGoToPos();
+    }
 
     /**
      * Sets the arm to Float mode
@@ -142,9 +172,10 @@ public class Arm implements ArmConstants, ProfileConstants, DriveConstants {
     }
 
     /**
-     * Resets the arm encoder. Use when the arm is in the down position
+     * Offsets the arm and wrist encoders. Use when arm and wrist are fully down
      */
-    public void resetEncoder() {
-        encoderOffset = leftShoulder.getCurrentPosition();
+    public void resetEncoders() {
+        armOffset = leftShoulder.getCurrentPosition();
+        wristOffset = wrist.getCurrentPosition();
     }
 }

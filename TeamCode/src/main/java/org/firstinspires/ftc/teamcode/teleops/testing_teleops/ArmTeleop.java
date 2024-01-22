@@ -51,7 +51,7 @@ public class ArmTeleop extends OpMode {
         else if(armGoToPos)
             arm.armGoToPosition(armDesiredPosition);
         else
-            arm.shoulderManual(shoulderPower);
+            arm.armManual(shoulderPower);
 
         if(wristGoToPos)
             arm.wristGoToPos(wristDesiredPos);

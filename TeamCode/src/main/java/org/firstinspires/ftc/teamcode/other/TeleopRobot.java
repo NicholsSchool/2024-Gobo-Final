@@ -209,7 +209,7 @@ public class TeleopRobot implements DriveConstants, ArmConstants {
         else if(operatorController.leftStickY.zeroLongEnough())
             arm.armGoToPosition(armDesiredPosition);
         else {
-            arm.shoulderManual(SHOULDER_MAX * operatorController.leftStickY.getValue());
+            arm.armManual(SHOULDER_MAX * operatorController.leftStickY.getValue());
             armDesiredPosition = arm.getArmPosition();
         }
 
@@ -252,7 +252,7 @@ public class TeleopRobot implements DriveConstants, ArmConstants {
         else if(splineToScoring)
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.STROBE_GOLD);
         else
-            lights.setDefaultPattern();
+            lights.setAllianceColor();
     }
 
     private void outputTelemetry() {
