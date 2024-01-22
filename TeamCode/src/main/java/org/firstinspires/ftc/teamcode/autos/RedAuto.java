@@ -51,7 +51,7 @@ public class RedAuto extends LinearOpMode implements DriveConstants, ArmConstant
 
 
         double[][] points1 = new double[][]{{36.0, 38.0}, {43.0, 57.0}, {55.5, 33.6}, {49.0, 10.8}};
-        double[][] points2 = new double[][]{{49.0, 10.8}, {2.6, -0.1}, {-13.5, 8.9}, {-57.3, 5.0}};
+        double[][] points2 = new double[][]{{49.0, 10.8}, {2.6, -0.1}, {-13.5, 8.9}, {-57.3, 7.0}};
 
         Spline spline1 = new Spline(points1, 20, drivetrain, 100);
         spline1.update();
